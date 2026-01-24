@@ -835,15 +835,15 @@ function renderAssets() {
             </div>
             <div class="asset-details">
                 <div class="asset-detail-row">
-                    <span class="asset-label">Cantitate:</span>
+                    <span class="asset-label">Quantity:</span>
                     <span class="asset-value">${asset.quantity.toFixed(6)}</span>
                 </div>
                 <div class="asset-detail-row">
-                    <span class="asset-label">Preț curent:</span>
+                    <span class="asset-label">Current price:</span>
                     <span class="asset-value">€${formatPrice(asset.currentPrice)}</span>
                 </div>
                 <div class="asset-detail-row">
-                    <span class="asset-label">Valoare totală:</span>
+                    <span class="asset-label">Total value:</span>
                     <span class="asset-value">€${formatPrice(currentValue)}</span>
                 </div>
             </div>
@@ -857,7 +857,7 @@ function renderAssets() {
 
 
 /**
- * @param {string} message - Mesajul de afișat.
+ * @param {string} message 
  */
 function showCustomAlert(message) {
     const statusDiv = document.createElement('div');
@@ -956,22 +956,22 @@ function handleAddFundsSubmit() {
     const cardCvv = document.getElementById('card-cvv').value;
     
     if (!amount || amount <= 0) {
-        showCustomAlert('Eroare: Introdu o sumă validă.');
+        showCustomAlert('Error: Enter a valid amount.');
         return;
     }
     
     if (cardNumber.length < 13 || cardNumber.length > 19) {
-        showCustomAlert('Eroare: Număr card invalid.');
+        showCustomAlert('Error: Invalid card number.');
         return;
     }
     
     if (!/^\d{2}\/\d{2}$/.test(cardExpiry)) {
-        showCustomAlert('Eroare: Data expirării invalidă. Folosește formatul MM/YY.');
+        showCustomAlert('Error: Invalid expiration date. Use the format MM/YY.');
         return;
     }
     
     if (cardCvv.length < 3 || cardCvv.length > 4) {
-        showCustomAlert('Eroare: CVV invalid.');
+        showCustomAlert('Error: Invalid CVV.');
         return;
     }
     
@@ -986,9 +986,9 @@ function openVerifyModal(amount, successMessage = null) {
     
     if (modal && message) {
         if (successMessage) {
-            message.textContent = `Procesăm retragerea de €${formatPrice(amount)}. Te rugăm să aștepți...`;
+            message.textContent = `Processing withdrawal of €${formatPrice(amount)}. Please wait...`;
         } else {
-            message.textContent = `Procesăm plata de €${formatPrice(amount)}. Te rugăm să aștepți...`;
+            message.textContent = `Processing payment of €${formatPrice(amount)}. Please wait...`;
         }
         
         modal.style.display = 'flex';

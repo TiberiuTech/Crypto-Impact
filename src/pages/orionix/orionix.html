@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ro">
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <title>Orionix</title>
@@ -13,74 +13,12 @@
   
   <main class="orionix-main">
     <h1>Orionix Token (ORX)</h1>
-    <p class="subtitle">Test token - Simulated data for demonstration</p>
+    <p class="subtitle">Token Simulation</p>
 
-    <div class="demo-token-dashboard">
-      <div class="demo-token-header">
-        <img src="../../../orionix.png" alt="Orionix Token" class="demo-token-icon">
-        <div class="demo-token-info">
-          <h2>Orionix</h2>
-          <span class="demo-token-symbol">ORX</span>
-        </div>
-        <div class="demo-token-price">
-          <div class="price-value" id="orx-price">$0.00</div>
-          <div class="price-change" id="orx-change">+0.00%</div>
-        </div>
-      </div>
-
-      <div class="demo-stats-grid">
-        <div class="stat-card">
-          <div class="stat-label">Price</div>
-          <div class="stat-value" id="orx-current-price">$0.00</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">Market Cap</div>
-          <div class="stat-value" id="orx-market-cap">$0</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">Volume 24h</div>
-          <div class="stat-value" id="orx-volume">$0</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-label">Supply</div>
-          <div class="stat-value">1,000,000 ORX</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">High 24h</div>
-          <div class="stat-value" id="orx-high">$0.00</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">Low 24h</div>
-          <div class="stat-value" id="orx-low">$0.00</div>
-        </div>
-      </div>
-
-      <div class="demo-chart-container">
-        <h3>Price Chart (Live Simulation)</h3>
-        <div id="orx-chart"></div>
-      </div>
-
-      <div class="demo-actions">
-        <button class="demo-btn buy-demo-btn" id="simulate-buy-btn">
-          Simulate Price Increase
-        </button>
-        <button class="demo-btn sell-demo-btn" id="simulate-sell-btn">
-          Simulate Price Decrease
-        </button>
-        <button class="demo-btn reset-demo-btn" id="reset-price-btn">
-          Reset Price
-        </button>
-      </div>
-    </div>
-
-    <div class="separator"></div>
-
-    <h2 style="color: #E6E6E6; margin-top: 40px; text-align: center;">Interaction with Real Token (MetaMask)</h2>
-    <p class="subtitle" style="text-align: center;">Connect MetaMask to interact with real ERC-20 tokens</p>
+    <h2 style="color: #E6E6E6; margin-top: 20px; margin-bottom: 15px; text-align: center;">Connect MetaMask</h2>
 
     <div class="orionix-container">
       <div class="add-contract-section">
-        <h2>Add Contract Token</h2>
         
         <div class="metamask-status" id="metamask-status">
           <span class="status-indicator" id="status-indicator"></span>
@@ -145,6 +83,68 @@
             </button>
           </div>
         </div>
+      </div>
+    </div>
+
+    <div class="separator"></div>
+
+    <h2 style="color: #E6E6E6; margin-top: 20px; margin-bottom: 15px; text-align: center;">Token Simulation</h2>
+
+    <div class="demo-token-dashboard">
+      <div class="demo-token-header">
+        <img src="../../../orionix.png" alt="Orionix Token" class="demo-token-icon">
+        <div class="demo-token-info">
+          <h2>Orionix</h2>
+          <span class="demo-token-symbol">ORX</span>
+        </div>
+        <div class="demo-token-price">
+          <div class="price-value" id="orx-price">$0.00</div>
+          <div class="price-change" id="orx-change">+0.00%</div>
+        </div>
+      </div>
+
+      <div class="demo-stats-grid">
+        <div class="stat-card">
+          <div class="stat-label">Price</div>
+          <div class="stat-value" id="orx-current-price">$0.00</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Market Cap</div>
+          <div class="stat-value" id="orx-market-cap">$0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Volume 24h</div>
+          <div class="stat-value" id="orx-volume">$0</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Supply</div>
+          <div class="stat-value">1,000,000 ORX</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">High 24h</div>
+          <div class="stat-value" id="orx-high">$0.00</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Low 24h</div>
+          <div class="stat-value" id="orx-low">$0.00</div>
+        </div>
+      </div>
+
+      <div class="demo-chart-container">
+        <h3>Price Chart (Live Simulation)</h3>
+        <div id="orx-chart"></div>
+      </div>
+
+      <div class="demo-actions">
+        <button class="demo-btn buy-demo-btn" id="simulate-buy-btn">
+          Simulate Price Increase
+        </button>
+        <button class="demo-btn sell-demo-btn" id="simulate-sell-btn">
+          Simulate Price Decrease
+        </button>
+        <button class="demo-btn reset-demo-btn" id="reset-price-btn">
+          Reset Price
+        </button>
       </div>
     </div>
 

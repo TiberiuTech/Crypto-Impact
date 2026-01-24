@@ -135,10 +135,20 @@ async function loadMarketData() {
 
         if (carouselContainer) {
             renderPriceCarouselStructure(filteredCoins.slice(0, CAROUSEL_COIN_COUNT));
-            filteredCoins.slice(0, CAROUSEL_COIN_COUNT).forEach((coin) => {
+            const carouselCoins = filteredCoins.slice(0, CAROUSEL_COIN_COUNT);
+            // Adăugăm grafice pentru prima jumătate
+            carouselCoins.forEach((coin, index) => {
                 chartQueue.push({ 
                     symbol: coin.CoinInfo.Name, 
-                    chartId: `carousel-chart-${coin.CoinInfo.Name}`, 
+                    chartId: `carousel-chart-${coin.CoinInfo.Name}-${index}`, 
+                    isPositive: coin.RAW.EUR.CHANGEPCT24HOUR > 0 
+                });
+            });
+            // Adăugăm grafice pentru a doua jumătate (duplicate)
+            carouselCoins.forEach((coin, index) => {
+                chartQueue.push({ 
+                    symbol: coin.CoinInfo.Name, 
+                    chartId: `carousel-chart-${coin.CoinInfo.Name}-${CAROUSEL_COIN_COUNT + index}`, 
                     isPositive: coin.RAW.EUR.CHANGEPCT24HOUR > 0 
                 });
             });
@@ -226,7 +236,7 @@ function renderPriceCarouselStructure(coins) {
         carouselItem.setAttribute('data-symbol', coinInfo.Name); 
         carouselItem.setAttribute('data-index', index); 
         
-        const sparklineId = `carousel-chart-${coinInfo.Name}`;
+        const sparklineId = `carousel-chart-${coinInfo.Name}-${index}`;
 
         carouselItem.innerHTML = `
             <div class="coin-info">
@@ -243,7 +253,19 @@ function renderPriceCarouselStructure(coins) {
         innerContainer.appendChild(carouselItem);
     });
 
-    innerContainer.innerHTML += innerContainer.innerHTML;
+    // Duplicăm conținutul și generăm ID-uri unice pentru duplicate
+    const firstHalf = innerContainer.innerHTML;
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = firstHalf;
+    
+    // Modificăm ID-urile pentru duplicate
+    tempDiv.querySelectorAll('.carousel-sparkline').forEach((element, index) => {
+        const originalId = element.id;
+        const symbol = originalId.replace('carousel-chart-', '').split('-')[0];
+        element.id = `carousel-chart-${symbol}-${coins.length + index}`;
+    });
+    
+    innerContainer.innerHTML += tempDiv.innerHTML;
 
     startCarouselScroll(carouselWrapper);
     setupCarouselInteraction(carouselWrapper);

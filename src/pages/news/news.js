@@ -94,7 +94,7 @@ function createNewsCard(article) {
 
             <div class="news-card-footer">
                 <a href="${article.url}" target="_blank" rel="noopener noreferrer" class="read-more">
-                    Citește mai mult
+                    Read more
                 </a>
             </div>
         </div>
@@ -117,13 +117,13 @@ function formatDate(date) {
     const diffDays = Math.floor(diffMs / 86400000);
 
     if (diffMins < 60) {
-        return `acum ${diffMins} ${diffMins === 1 ? 'minut' : 'minute'}`;
+        return `about ${diffMins} ${diffMins === 1 ? 'minute' : 'minutes'}`;
     } else if (diffHours < 24) {
-        return `acum ${diffHours} ${diffHours === 1 ? 'oră' : 'ore'}`;
+        return `about ${diffHours} ${diffHours === 1 ? 'hour' : 'hours'}`;
     } else if (diffDays < 7) {
-        return `acum ${diffDays} ${diffDays === 1 ? 'zi' : 'zile'}`;
+        return `about ${diffDays} ${diffDays === 1 ? 'day' : 'days'}`;
     } else {
-        return date.toLocaleDateString('ro-RO', {
+        return date.toLocaleDateString('en-US', {
             day: 'numeric',
             month: 'short',
             year: 'numeric'
