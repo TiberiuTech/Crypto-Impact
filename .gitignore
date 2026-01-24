@@ -1,25 +1,21 @@
-# Environment variables (conțin chei secrete)
+
 .env
 *.env
 
-# Node modules
 node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# IDEs
 .vscode/
 .idea/
 *.swp
 *.swo
 *~
 
-# OS
 .DS_Store
 Thumbs.db
 
-# Build outputs
 dist/
 build/
 *.log

@@ -2,12 +2,10 @@ document.addEventListener("DOMContentLoaded", function() {
     const navbarPlaceholder = document.getElementById("navbar-placeholder");
 
     if (navbarPlaceholder) {
-        // Try multiple candidate URLs for the navbar partial in order of preference
+
         const candidates = [];
-        // 1) Absolute known location (works with Live Server and proxy)
         candidates.push(window.location.origin + '/src/navbar/navbar.html');
 
-        // 2) Derived from the script's src (works if the script was included relatively)
         const scriptEl = document.currentScript || Array.from(document.getElementsByTagName('script')).pop();
         const scriptSrc = scriptEl && scriptEl.src ? scriptEl.src : null;
         if (scriptSrc) {
@@ -15,10 +13,8 @@ document.addEventListener("DOMContentLoaded", function() {
             candidates.push(base + '/navbar.html');
         }
 
-        // 3) Relative fallback (same folder as page)
         candidates.push('navbar.html');
 
-        // Helper: attempt to fetch candidates sequentially
         (async function tryCandidates() {
             for (const url of candidates) {
                 try {
@@ -27,7 +23,6 @@ document.addEventListener("DOMContentLoaded", function() {
                         const data = await res.text();
                         navbarPlaceholder.innerHTML = data;
 
-                        // --- Partea de "Activ" ---
                         const currentPage = window.location.pathname;
                         const navLinks = navbarPlaceholder.querySelectorAll(".nav-links a");
 
@@ -37,28 +32,22 @@ document.addEventListener("DOMContentLoaded", function() {
                                 link.classList.add("active");
                             }
                         });
-                        // --- Sfârșit parte "Activ" ---
-                        
-                        // Actualizăm starea de autentificare imediat după ce navbar-ul este încărcat
                         updateNavbarAuthStateAfterLoad();
                         
-                        // Încărcăm scriptul pentru gestionarea stării de autentificare
                         loadAuthStateScript();
                         
                         return;
                     }
                 } catch (err) {
-                    // ignore and try next
+                    console.error('Error at loading navbar from any attempted location:', candidates);
                 }
             }
-            console.error('Eroare: nu am putut încărca navbar-ul din niciun loc încercat:', candidates);
+            console.error('Error at loading navbar from any attempted location:', candidates);
         })();
     }
 });
 
-// Funcție pentru actualizarea stării de autentificare (fără a depinde de scriptul extern)
 function updateNavbarAuthStateAfterLoad() {
-    // Așteptăm puțin pentru ca DOM-ul să fie actualizat
     setTimeout(() => {
         const authButtons = document.getElementById('auth-buttons');
         const userInfoNavbar = document.getElementById('user-info-navbar');
@@ -66,66 +55,54 @@ function updateNavbarAuthStateAfterLoad() {
         const logoutBtn = document.getElementById('logout-btn');
 
         if (!authButtons || !userInfoNavbar || !userNameNavbar) {
-            // Elementele nu sunt încă încărcate, încercăm din nou
             setTimeout(updateNavbarAuthStateAfterLoad, 100);
             return;
         }
 
-        // Verificăm dacă utilizatorul este autentificat
         const userData = localStorage.getItem('user');
         
         if (userData) {
             try {
                 const user = JSON.parse(userData);
-                // Utilizatorul este autentificat - afișăm numele și butonul de logout
                 authButtons.style.display = 'none';
                 userInfoNavbar.style.display = 'flex';
                 
-                // Afișăm numele utilizatorului (displayName sau email)
                 const displayName = user.displayName || user.email || 'Utilizator';
                 userNameNavbar.textContent = displayName;
                 
-                // Adăugăm event listener pentru butonul de logout
                 if (logoutBtn && !logoutBtn.hasAttribute('data-listener-added')) {
                     logoutBtn.setAttribute('data-listener-added', 'true');
-                    logoutBtn.addEventListener('click', function() {
-                        // Ștergem datele utilizatorului din localStorage
+                    logoutBtn.addEventListener('click', function() {    
                         localStorage.removeItem('user');
                         
-                        // Dacă Firebase este disponibil, facem logout și de acolo
                         if (typeof firebase !== 'undefined' && firebase.auth) {
                             const auth = firebase.auth();
                             if (auth.currentUser) {
                                 auth.signOut().then(() => {
-                                    console.log('Logout reușit');
+                                    console.log('Logout successful');
                                 }).catch((error) => {
-                                    console.error('Eroare la logout:', error);
+                                    console.error('Error at logout:', error);
                                 });
                             }
                         }
                         
-                        // Actualizăm navbar-ul
                         updateNavbarAuthStateAfterLoad();
                         
-                        // Redirecționăm către pagina principală
                         window.location.href = '/src/pages/home/home.html';
                     });
                 }
             } catch (error) {
-                console.error('Eroare la parsarea datelor utilizatorului:', error);
-                // Dacă există o eroare, afișăm butoanele de login/register
+                console.error('Error at parsing user data:', error);
                 authButtons.style.display = 'flex';
                 userInfoNavbar.style.display = 'none';
             }
         } else {
-            // Utilizatorul NU este autentificat - afișăm butoanele de login/register
             authButtons.style.display = 'flex';
             userInfoNavbar.style.display = 'none';
         }
     }, 50);
 }
 
-// Funcție pentru încărcarea scriptului de autentificare
 function loadAuthStateScript() {
     const candidates = [];
     candidates.push(window.location.origin + '/src/navbar/authState.js');
@@ -147,7 +124,6 @@ function loadAuthStateScript() {
                     const script = document.createElement('script');
                     script.src = url;
                     script.onload = function() {
-                        // După ce scriptul s-a încărcat, actualizăm starea
                         if (typeof updateNavbarAuthState === 'function') {
                             updateNavbarAuthState();
                         }
@@ -156,9 +132,9 @@ function loadAuthStateScript() {
                     return;
                 }
             } catch (err) {
-                // ignore and try next
+                console.error('Error at loading authState.js:', err);
             }
         }
-        console.warn('Nu s-a putut încărca authState.js');
+        console.warn('Error at loading authState.js');
     })();
 }

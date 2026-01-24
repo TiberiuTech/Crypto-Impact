@@ -1,7 +1,3 @@
-// Configurația Firebase pentru aplicația licenta
-// Acest fișier este folosit când Firebase este încărcat prin CDN
-
-// Configurația aplicației web Firebase
 const firebaseConfig = {
   apiKey: "AIzaSyCUBaBkHSTdHmKdIfZCezkpA-18edvdzew",
   authDomain: "licenta-27ed8.firebaseapp.com",
@@ -12,17 +8,15 @@ const firebaseConfig = {
   measurementId: "G-H97EH5Q57V"
 };
 
-// Inițializăm Firebase (când este disponibil global)
 let app, auth;
 
 if (typeof firebase !== 'undefined') {
   app = firebase.initializeApp(firebaseConfig);
   auth = firebase.auth();
 } else {
-  console.error('Firebase nu este încărcat. Asigură-te că incluzi Firebase SDK înainte de acest script.');
+  console.error('Firebase is not loaded.');
 }
 
-// Exportăm pentru compatibilitate
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = { firebaseConfig, app, auth };
 }

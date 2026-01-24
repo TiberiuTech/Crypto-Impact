@@ -2,13 +2,12 @@
 <html lang="ro">
 <head>
     <meta charset="UTF-8">
-    <title>Trade - Orionix</title>
+    <title>Trade</title>
     <link rel="stylesheet" href="../../style.css">
     <link rel="stylesheet" href="../../navbar/navbar.css">
     <link rel="stylesheet" href="trade.css">
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
     
-    <!-- Script de protecție - verifică autentificarea -->
     <script src="../../utils/authGuard.js"></script>
 </head>
 <body>
@@ -18,58 +17,49 @@
         <h1>Trade</h1>
         
         <div class="trade-container">
-            <!-- Coloana stângă: Assets și Balanță -->
             <div class="trade-sidebar">
                 <div class="wallet-info-card">
-                    <h3>Balanță</h3>
+                    <h3>Balance</h3>
                     <div class="balance-display" id="trade-balance">$0.00</div>
                 </div>
                 
                 <div class="assets-section">
-                    <h3>Assets Disponibile</h3>
+                    <h3>Available Assets</h3>
                     <div id="trade-assets-list" class="assets-list">
-                        <!-- Assets-urile vor fi populate de JavaScript -->
                     </div>
                 </div>
                 
-                <!-- Istoric Tranzacții -->
                 <div class="trade-history-section">
-                    <h3>Istoric Tranzacții</h3>
+                    <h3>Trade History</h3>
                     <div id="trade-history-list" class="trade-history-list">
-                        <!-- Tranzacțiile vor fi populate de JavaScript -->
                     </div>
                 </div>
             </div>
             
-            <!-- Coloana centrală: Grafic și Trading -->
             <div class="trade-center">
-                <!-- Selector monedă -->
                 <div class="coin-selector">
-                    <label for="trade-coin-select">Selectează Monedă:</label>
+                    <label for="trade-coin-select">Select Coin:</label>
                     <div id="trade-coin-select-wrapper" class="custom-coin-dropdown-wrapper">
                         <select id="trade-coin-select" class="coin-dropdown" style="display: none;">
-                            <option value="">Selectează...</option>
+                            <option value="">Select...</option>
                         </select>
                         <div id="trade-coin-select-selected" class="custom-coin-dropdown-selected">
                             <div class="custom-coin-dropdown-display">
                                 <img id="trade-coin-icon-preview" src="" alt="" style="display: none; width: 24px; height: 24px; border-radius: 50%; margin-right: 8px;">
-                                <span class="custom-coin-dropdown-text">Selectează...</span>
+                                <span class="custom-coin-dropdown-text">Select...</span>
                                 <span class="custom-coin-dropdown-arrow">▼</span>
                             </div>
                         </div>
                         <div id="trade-coin-select-options" class="custom-coin-dropdown-options">
-                            <!-- Opțiunile vor fi populate de JavaScript -->
                         </div>
                     </div>
                     <div id="selected-coin-info" class="coin-info"></div>
                 </div>
                 
-                <!-- Grafic de trade -->
                 <div class="chart-container">
                     <div id="trade-chart"></div>
                 </div>
                 
-                <!-- Butoane Buy/Sell Now -->
                 <div class="trade-actions">
                     <button id="buy-now-btn" class="trade-btn buy-btn">Buy Now</button>
                     <button id="sell-now-btn" class="trade-btn sell-btn">Sell Now</button>
@@ -77,96 +67,89 @@
                 
             </div>
             
-            <!-- Coloana dreaptă: Limit Orders și Istoric -->
             <div class="trade-sidebar-right">
-                <!-- Limit Orders -->
                 <div class="limit-orders-section">
                     <h3>Limit Orders</h3>
                     <div class="limit-order-form">
                         <div class="form-group">
-                            <label>Tip:</label>
+                            <label>Type:</label>
                             <div class="order-type-buttons">
                                 <button type="button" id="limit-order-buy-btn" class="order-type-btn buy-type-btn active">Buy</button>
                                 <button type="button" id="limit-order-sell-btn" class="order-type-btn sell-type-btn">Sell</button>
                             </div>
                         </div>
                         <div class="form-group">
-                            <label for="limit-quantity">Cantitate:</label>
+                            <label for="limit-quantity">Quantity:</label>
                             <input type="number" id="limit-quantity" step="any" min="0.000001" placeholder="0.000000">
                         </div>
                         <div class="form-group">
-                            <label for="limit-price">Preț Limit:</label>
+                            <label for="limit-price">Limit Price:</label>
                             <input type="number" id="limit-price" step="any" min="0.000001" placeholder="0.00">
                             <div class="price-shortcuts">
                                 <button type="button" id="price-minus-1" class="price-shortcut-btn">-1%</button>
                                 <button type="button" id="price-plus-1" class="price-shortcut-btn">+1%</button>
                             </div>
                         </div>
-                        <button id="create-limit-order-btn" class="limit-order-btn">Creează Order</button>
+                        <button id="create-limit-order-btn" class="limit-order-btn">Create Order</button>
                     </div>
                 </div>
                 
-                <!-- Pending Orders -->
                 <div class="pending-orders-section">
-                    <h3>Ordere în Așteptare</h3>
+                    <h3>Pending Orders</h3>
                     <div id="pending-orders-list" class="pending-orders-list">
-                        <!-- Orderele vor fi populate de JavaScript -->
                     </div>
                 </div>
             </div>
         </div>
     </main>
     
-    <!-- Modal Buy -->
     <div id="buy-modal" class="trade-modal">
         <div class="trade-modal-content">
             <span class="trade-modal-close" id="close-buy-modal">&times;</span>
             <h2>Buy</h2>
             <div class="form-group">
-                <label for="buy-quantity">Cantitate:</label>
+                <label for="buy-quantity">Quantity:</label>
                 <input type="number" id="buy-quantity" step="any" min="0.000001" placeholder="0.000000">
             </div>
             <div class="form-group">
-                <label for="buy-price">Preț:</label>
+                <label for="buy-price">Price:</label>
                 <input type="number" id="buy-price" step="any" min="0.000001" placeholder="0.00" readonly>
             </div>
             <div class="form-group">
                 <span class="form-label">Total:</span>
                 <div id="buy-total" class="total-display">€0.00</div>
             </div>
-            <button id="confirm-buy-btn" class="confirm-btn buy-confirm">Confirmă Cumpărare</button>
+            <button id="confirm-buy-btn" class="confirm-btn buy-confirm">Confirm Buy</button>
         </div>
     </div>
 
-    <!-- Modal Sell -->
     <div id="sell-modal" class="trade-modal">
         <div class="trade-modal-content">
             <span class="trade-modal-close" id="close-sell-modal">&times;</span>
             <h2>Sell</h2>
             <div class="form-group">
-                <label for="sell-quantity">Cantitate:</label>
+                <label for="sell-quantity">Quantity:</label>
                 <input type="number" id="sell-quantity" step="any" min="0.000001" placeholder="0.000000">
             </div>
             <div class="form-group">
-                <label for="sell-price">Preț:</label>
+                <label for="sell-price">Price:</label>
                 <input type="number" id="sell-price" step="any" min="0.000001" placeholder="0.00" readonly>
             </div>
             <div class="form-group">
                 <span class="form-label">Total:</span>
                 <div id="sell-total" class="total-display">€0.00</div>
             </div>
-            <button id="confirm-sell-btn" class="confirm-btn sell-confirm">Confirmă Vânzare</button>
+            <button id="confirm-sell-btn" class="confirm-btn sell-confirm">Confirm Sell</button>
         </div>
     </div>
 
-    <!-- Modal de Verificare -->
     <div id="verifyModal" class="modal">
         <div class="modal-content verify-modal-content">
             <div class="verify-loader" id="verify-loader">
                 <div class="spinner"></div>
             </div>
             <div class="verify-icon" id="verify-icon" style="display: none;">✓</div>
-            <p id="verify-message">Procesăm tranzacția...</p>
+            <p id="verify-message">Processing transaction...</p>
         </div>
     </div>
 

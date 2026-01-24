@@ -1,4 +1,3 @@
-// Configurația Firebase
 const firebaseConfig = {
   apiKey: "AIzaSyCUBaBkHSTdHmKdIfZCezkpA-I8edvdzew",
   authDomain: "licenta-27ed8.firebaseapp.com",
@@ -9,69 +8,58 @@ const firebaseConfig = {
   measurementId: "G-H97EH5Q57V"
 };
 
-// Verificăm dacă utilizatorul este deja autentificat
 (function checkIfAlreadyAuthenticated() {
     const userData = localStorage.getItem('user');
     if (userData) {
         try {
             const user = JSON.parse(userData);
             if (user.uid && user.email) {
-                // Utilizatorul este deja autentificat - redirecționăm către home
-                console.log('Utilizator deja autentificat. Redirecționare către home...');
+                console.log('User already authenticated. Redirecting to home...');
                 window.location.href = '/src/pages/home/home.html';
                 return;
             }
         } catch (error) {
-            // Date invalide - continuăm la register
             localStorage.removeItem('user');
         }
     }
 })();
 
-// Declarăm auth global
 let auth;
 
-// Funcție pentru inițializarea Firebase
 function initializeFirebase() {
     if (typeof firebase === 'undefined') {
-        console.error('Firebase SDK nu este încărcat! Verifică scripturile din HTML.');
+        console.error('Firebase SDK not loaded! Check the scripts in HTML.');
         return false;
     }
     
     try {
-        // Verificăm dacă Firebase este deja inițializat
         let app;
         try {
             app = firebase.app();
-            console.log('Firebase deja inițializat');
+            console.log('Firebase already initialized');
         } catch (e) {
-            // Nu există app inițializat, inițializăm
-            console.log('Inițializăm Firebase...');
+            console.log('Initializing Firebase...');
             app = firebase.initializeApp(firebaseConfig);
-            console.log('Firebase inițializat cu succes');
+            console.log('Firebase initialized successfully');
         }
         auth = firebase.auth();
-        console.log('Firebase Auth inițializat');
+        console.log('Firebase Auth initialized');
         return true;
     } catch (error) {
-        console.error('Eroare la inițializarea Firebase:', error);
+        console.error('Error at initializing Firebase:', error);
         return false;
     }
 }
 
-// Inițializăm Firebase când DOM-ul este gata
 document.addEventListener('DOMContentLoaded', function() {
-    // Așteptăm puțin pentru a ne asigura că Firebase SDK este încărcat
     setTimeout(() => {
         if (!initializeFirebase()) {
-            console.error('Nu s-a putut inițializa Firebase!');
+            console.error('Error at initializing Firebase!');
         }
     }, 100);
 });
 
-// Așteptăm ca Firebase să fie inițializat înainte de a continua
 document.addEventListener('DOMContentLoaded', () => {
-    // Așteptăm puțin mai mult pentru a ne asigura că Firebase este gata
     setTimeout(() => {
         setupRegisterForm();
     }, 200);
@@ -86,7 +74,6 @@ function setupRegisterForm() {
     const emailError = document.getElementById('email-error');
     const passwordError = document.getElementById('password-error');
 
-    // Funcție pentru afișarea erorilor
     function showError(element, message) {
         element.textContent = message;
         element.style.display = 'block';
@@ -97,21 +84,18 @@ function setupRegisterForm() {
         element.style.display = 'none';
     }
 
-    // Validare nume (minim 3 caractere)
     function validateName(name) {
         return name.trim().length >= 3;
     }
 
-    // Validare email
     function validateEmail(email) {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         return emailRegex.test(email);
     }
 
-    // Validare parolă: minim 6 caractere, o cifră, un simbol și o literă
     function validatePassword(password) {
         if (password.length < 6) {
-            return { valid: false, message: 'Parola trebuie să aibă minim 6 caractere' };
+            return { valid: false, message: 'password must be at least 6 characters long' };
         }
         
         const hasDigit = /\d/.test(password);
@@ -119,25 +103,23 @@ function setupRegisterForm() {
         const hasLetter = /[a-zA-Z]/.test(password);
 
         if (!hasDigit) {
-            return { valid: false, message: 'Parola trebuie să conțină cel puțin o cifră' };
+            return { valid: false, message: 'Password must contain at least one digit' };
         }
         
         if (!hasSymbol) {
-            return { valid: false, message: 'Parola trebuie să conțină cel puțin un simbol' };
+            return { valid: false, message: 'Password must contain at least one symbol' };
         }
         
         if (!hasLetter) {
-            return { valid: false, message: 'Parola trebuie să conțină cel puțin o literă' };
+            return { valid: false, message: 'Password must contain at least one letter' };
         }
 
         return { valid: true };
     }
 
-    // Handler pentru submit formular
     registerForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         
-        // Curățăm erorile anterioare
         clearError(nameError);
         clearError(emailError);
         clearError(passwordError);
@@ -151,31 +133,28 @@ function setupRegisterForm() {
 
         let hasErrors = false;
 
-        // Validare nume
         if (!name) {
-            showError(nameError, 'Numele este obligatoriu');
+            showError(nameError, 'Name is required');
             nameInput.classList.add('error');
             hasErrors = true;
         } else if (!validateName(name)) {
-            showError(nameError, 'Numele trebuie să aibă minim 3 caractere');
+            showError(nameError, 'Name must be at least 3 characters long');
             nameInput.classList.add('error');
             hasErrors = true;
         }
 
-        // Validare email
         if (!email) {
-            showError(emailError, 'Email-ul este obligatoriu');
+            showError(emailError, 'Email is required');
             emailInput.classList.add('error');
             hasErrors = true;
         } else if (!validateEmail(email)) {
-            showError(emailError, 'Email-ul trebuie să conțină @ și un domeniu valid');
+            showError(emailError, 'Email must contain @ and a valid domain');
             emailInput.classList.add('error');
             hasErrors = true;
         }
 
-        // Validare parolă
         if (!password) {
-            showError(passwordError, 'Parola este obligatorie');
+            showError(passwordError, 'Password is required');
             passwordInput.classList.add('error');
             hasErrors = true;
         } else {
@@ -191,60 +170,54 @@ function setupRegisterForm() {
             return;
         }
 
-        // Verificăm dacă auth este disponibil
         if (!auth) {
-            showError(emailError, 'Firebase nu este inițializat corect. Reîncarcă pagina.');
+            showError(emailError, 'Firebase not initialized correctly. Reload the page.');
             return;
         }
 
-        // Încercăm crearea contului
         try {
             const userCredential = await auth.createUserWithEmailAndPassword(email, password);
             const user = userCredential.user;
             
-            // Actualizăm profilul cu numele
             await user.updateProfile({
                 displayName: name
             });
 
-            // Salvez informațiile utilizatorului în localStorage
             localStorage.setItem('user', JSON.stringify({
                 uid: user.uid,
                 email: user.email,
                 displayName: name
             }));
 
-            // Actualizăm navbar-ul dacă funcția există
             if (typeof updateNavbarAuthState === 'function') {
                 updateNavbarAuthState();
             }
 
-            // Redirecționăm către pagina principală
             window.location.href = '/src/pages/home/home.html';
         } catch (error) {
-            console.error('Eroare la înregistrare:', error);
+            console.error('Error at registration:', error);
             
             // Gestionăm erorile Firebase
             let errorMessage = '';
             switch (error.code) {
                 case 'auth/api-key-not-valid':
                 case 'auth/api-key-not-valid.-please-pass-a-valid-api-key.':
-                    errorMessage = 'API key Firebase invalid. Verifică configurația în consolă Firebase și asigură-te că Authentication este activat.';
+                    errorMessage = 'API key Firebase invalid. Check the Firebase console and ensure Authentication is activated.';
                     break;
                 case 'auth/email-already-in-use':
-                    errorMessage = 'Acest email este deja înregistrat. Te rugăm să te autentifici.';
+                    errorMessage = 'This email is already registered. Please login.';
                     break;
                 case 'auth/invalid-email':
                     errorMessage = 'Email invalid.';
                     break;
                 case 'auth/weak-password':
-                    errorMessage = 'Parola este prea slabă.';
+                        errorMessage = 'Password is too weak.';
                     break;
                 case 'auth/operation-not-allowed':
-                    errorMessage = 'Operația nu este permisă. Contactează administratorul.';
+                    errorMessage = 'Operation not allowed. Contact the administrator.';
                     break;
                 default:
-                    errorMessage = `Eroare la înregistrare: ${error.message || 'Te rugăm să încerci din nou.'}`;
+                    errorMessage = `Error at registration: ${error.message || 'Please try again.'}`;
             }
             
             showError(emailError, errorMessage);

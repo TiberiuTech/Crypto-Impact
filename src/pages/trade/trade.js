@@ -2,7 +2,6 @@ import { formatPrice } from '../../utils/formatters.js';
 import { allMarketData } from '../../client.js';
 import { ChartRenderer } from '../../charts/chartRenderer.js';
 
-// Funcție pentru a obține cheile de stocare bazate pe UID-ul utilizatorului
 function getStorageKeys() {
     const userData = localStorage.getItem('user');
     let userId = 'anonymous';
@@ -12,7 +11,7 @@ function getStorageKeys() {
             const user = JSON.parse(userData);
             userId = user.uid || 'anonymous';
         } catch (error) {
-            console.error('Eroare la parsarea datelor utilizatorului:', error);
+            console.error('Error at parsing user data:', error);
         }
     }
     
@@ -24,7 +23,6 @@ function getStorageKeys() {
     };
 }
 
-// Variabile globale
 let currentBalance = 0;
 let userAssets = [];
 let limitOrders = [];
@@ -36,35 +34,29 @@ let priceUpdateInterval = null;
 
 const MARKET_URL = 'http://localhost:3000/api/market';
 
-// Inițializare
 document.addEventListener('DOMContentLoaded', () => {
     loadWalletData();
     loadLimitOrders();
     loadTradeHistory();
     setupEventListeners();
-    loadMarketData(); // Aceasta va preselecta automat BTC când datele sunt încărcate
+    loadMarketData();
     startPriceMonitoring();
     
-    // Verifică dacă există parametru symbol în URL (are prioritate față de BTC)
     const urlParams = new URLSearchParams(window.location.search);
     const symbolParam = urlParams.get('symbol');
     if (symbolParam) {
-        // Așteaptă ca datele să se încarce, apoi selectează moneda specificată
         setTimeout(() => autoSelectCoin(symbolParam), 1000);
     }
 });
 
-// Ascultăm pentru schimbări în localStorage (când utilizatorul se loghează/înregistrează)
 window.addEventListener('storage', function(e) {
     if (e.key === 'user') {
-        // Utilizatorul s-a schimbat - reîncărcăm datele
         loadWalletData();
         loadLimitOrders();
         loadTradeHistory();
     }
 });
 
-// De asemenea, verificăm la fiecare încărcare a paginii dacă utilizatorul s-a schimbat
 let lastUserId = null;
 function checkUserChange() {
     const userData = localStorage.getItem('user');
@@ -75,12 +67,10 @@ function checkUserChange() {
             const user = JSON.parse(userData);
             currentUserId = user.uid || 'anonymous';
         } catch (error) {
-            // Ignorăm eroarea
         }
     }
     
     if (lastUserId !== null && lastUserId !== currentUserId) {
-        // Utilizatorul s-a schimbat - reîncărcăm datele
         loadWalletData();
         loadLimitOrders();
         loadTradeHistory();
@@ -89,20 +79,16 @@ function checkUserChange() {
     lastUserId = currentUserId;
 }
 
-// Verificăm la încărcarea paginii
 checkUserChange();
 
-// Verificăm periodic (în cazul în care utilizatorul se schimbă în același tab)
 setInterval(checkUserChange, 1000);
 
-// Încarcă datele din wallet
 function loadWalletData() {
     const storageKeys = getStorageKeys();
     const storedBalance = localStorage.getItem(storageKeys.balance);
     if (storedBalance) {
         currentBalance = parseFloat(storedBalance);
     } else {
-        // Dacă nu există sold pentru utilizatorul curent, îl setăm la 0
         currentBalance = 0;
     }
     
@@ -117,7 +103,6 @@ function loadWalletData() {
     renderAssetsList();
 }
 
-// Actualizează afișarea balanței
 function updateBalanceDisplay() {
     const balanceElement = document.getElementById('trade-balance');
     if (balanceElement) {
@@ -130,7 +115,6 @@ function updateBalanceDisplay() {
     }
 }
 
-// Renderizează lista de assets
 function renderAssetsList() {
     const assetsList = document.getElementById('trade-assets-list');
     if (!assetsList) return;
@@ -138,7 +122,7 @@ function renderAssetsList() {
     assetsList.innerHTML = '';
     
     if (userAssets.length === 0) {
-        assetsList.innerHTML = '<p style="color: #8B949E; text-align: center; padding: 20px;">Nu ai assets disponibile</p>';
+        assetsList.innerHTML = '<p style="color: #8B949E; text-align: center; padding: 20px;">You have no available assets</p>';
         return;
     }
     
@@ -166,27 +150,22 @@ function renderAssetsList() {
     });
 }
 
-// Selectează un asset
 function selectAsset(asset) {
-    // Remove active class from all items
     document.querySelectorAll('.asset-item').forEach(item => {
         item.classList.remove('active');
     });
     
-    // Add active class to selected item
     const selectedItem = document.querySelector(`[data-symbol="${asset.symbol}"]`);
     if (selectedItem) {
         selectedItem.classList.add('active');
     }
     
-    // Find coin in market data
     const coin = allMarketData.find(c => c.CoinInfo.Name === asset.symbol);
     if (coin) {
         selectCoin(coin);
     }
 }
 
-// Încarcă datele de piață
 async function loadMarketData() {
     try {
         const response = await fetch(MARKET_URL);
@@ -195,11 +174,10 @@ async function loadMarketData() {
         
         populateCoinSelector(coins);
     } catch (error) {
-        console.error('Eroare la încărcarea datelor de piață:', error);
+        console.error('Error at loading market data:', error);
     }
 }
 
-// Populează selectorul de monede
 function populateCoinSelector(coins) {
     const select = document.getElementById('trade-coin-select');
     const optionsContainer = document.getElementById('trade-coin-select-options');
@@ -210,7 +188,6 @@ function populateCoinSelector(coins) {
     
     if (!select || !optionsContainer || !wrapper) return;
     
-    // Ștergem opțiunile existente (except prima)
     while (select.options.length > 1) {
         select.remove(1);
     }
@@ -221,14 +198,12 @@ function populateCoinSelector(coins) {
         const fullName = coin.CoinInfo.FullName;
         const iconUrl = `https://www.cryptocompare.com${coin.CoinInfo.ImageUrl}`;
         
-        // Adăugăm în select-ul hidden
         const option = document.createElement('option');
         option.value = symbol;
         option.textContent = `${symbol} - ${fullName}`;
         option.setAttribute('data-coin', JSON.stringify(coin));
         select.appendChild(option);
         
-        // Adăugăm în dropdown-ul custom cu iconiță
         const customOption = document.createElement('div');
         customOption.className = 'custom-coin-dropdown-option';
         customOption.setAttribute('data-value', symbol);
@@ -246,7 +221,6 @@ function populateCoinSelector(coins) {
             const coinData = JSON.parse(customOption.getAttribute('data-coin'));
             selectCoin(coinData);
             
-            // Actualizăm afișajul selectat
             selectedText.textContent = `${symbol} - ${fullName}`;
             iconPreview.src = iconUrl;
             iconPreview.style.display = 'block';
@@ -254,18 +228,14 @@ function populateCoinSelector(coins) {
                 this.src = 'https://placehold.co/24x24/161B22/FFFFFF?text=?';
             };
             
-            // Actualizăm select-ul hidden
-            select.value = symbol;
+                select.value = symbol;
             
-            // Închidem dropdown-ul
             wrapper.classList.remove('active');
         });
         
         optionsContainer.appendChild(customOption);
     });
     
-    // Event listener pentru a deschide/închide dropdown-ul (doar o singură dată)
-    // Verificăm dacă nu a fost deja adăugat
     if (!selectedDisplay.hasAttribute('data-listener-added')) {
         selectedDisplay.setAttribute('data-listener-added', 'true');
         selectedDisplay.addEventListener('click', (e) => {
@@ -274,7 +244,6 @@ function populateCoinSelector(coins) {
         });
     }
     
-    // Închidem dropdown-ul când se face click în afara lui (doar o singură dată)
     if (!wrapper.hasAttribute('data-document-listener-added')) {
         wrapper.setAttribute('data-document-listener-added', 'true');
         document.addEventListener('click', (e) => {
@@ -284,12 +253,9 @@ function populateCoinSelector(coins) {
         });
     }
     
-    // Preselectează BTC după ce s-au adăugat toate opțiunile
-    // Verificăm dacă există parametru symbol în URL - are prioritate
     const urlParams = new URLSearchParams(window.location.search);
     const symbolParam = urlParams.get('symbol');
     
-    // Dacă nu există parametru în URL, selectăm BTC automat
     if (!symbolParam) {
         const btcCoin = coins.find(c => c.CoinInfo.Name === 'BTC');
         if (btcCoin) {
@@ -306,25 +272,22 @@ function populateCoinSelector(coins) {
     }
 }
 
-// Selectează o monedă pentru trading
 function selectCoin(coin) {
     selectedCoin = coin;
     const coinInfo = coin.CoinInfo;
     const rawData = coin.RAW.EUR;
     
-    // Update coin info display
     const coinInfoElement = document.getElementById('selected-coin-info');
     if (coinInfoElement) {
         coinInfoElement.innerHTML = `
             <strong>${coinInfo.FullName}</strong> (${coinInfo.Name})<br>
-            Preț: €${formatPrice(rawData.PRICE)} | 
+            Price: ${formatPrice(rawData.PRICE)} | 
             <span class="${rawData.CHANGEPCT24HOUR >= 0 ? 'positive' : 'negative'}">
                 ${rawData.CHANGEPCT24HOUR >= 0 ? '+' : ''}${rawData.CHANGEPCT24HOUR.toFixed(2)}%
             </span>
         `;
     }
     
-    // Update dropdown display
     const selectedText = document.querySelector('#trade-coin-select-selected .custom-coin-dropdown-text');
     const iconPreview = document.getElementById('trade-coin-icon-preview');
     const select = document.getElementById('trade-coin-select');
@@ -346,26 +309,21 @@ function selectCoin(coin) {
         select.value = coinInfo.Name;
     }
     
-    // Update price inputs
     const currentPrice = rawData.PRICE;
     document.getElementById('buy-price').value = currentPrice.toFixed(2);
     document.getElementById('sell-price').value = currentPrice.toFixed(2);
     
-    // Store current price for limit orders
     window.currentCoinPrice = currentPrice;
     
-    // Load chart
     loadChart(coinInfo.Name, currentPrice, rawData.CHANGEPCT24HOUR >= 0);
     
-    // Update forms
     updateBuyForm();
     updateSellForm();
 }
 
-// Setează prețul limit cu un procentaj față de prețul curent
 function setLimitPriceWithPercent(percent) {
     if (!selectedCoin || !window.currentCoinPrice) {
-        showCustomAlert('Selectează o monedă mai întâi!');
+        showCustomAlert('Select a coin first!');
         return;
     }
     
@@ -378,7 +336,6 @@ function setLimitPriceWithPercent(percent) {
     }
 }
 
-// Încarcă graficul
 async function loadChart(symbol, currentPrice, isPositive) {
     const chartContainer = document.getElementById('trade-chart');
     if (!chartContainer) return;
@@ -395,7 +352,7 @@ async function loadChart(symbol, currentPrice, isPositive) {
             
             const options = {
                 series: [{
-                    name: 'Preț',
+                    name: 'price',
                     data: historyData
                 }],
                 chart: {
@@ -426,13 +383,11 @@ async function loadChart(symbol, currentPrice, isPositive) {
             chartInstance.render();
         }
     } catch (error) {
-        console.error('Eroare la încărcarea graficului:', error);
-    }
+        console.error('Error at loading chart:', error);
+    }   
 }
 
-// Setup event listeners
 function setupEventListeners() {
-    // Buy/Sell Now buttons
     document.getElementById('buy-now-btn').addEventListener('click', () => {
         showBuyModal();
     });
@@ -441,7 +396,6 @@ function setupEventListeners() {
         showSellModal();
     });
     
-    // Close modal buttons
     document.getElementById('close-buy-modal').addEventListener('click', () => {
         closeBuyModal();
     });
@@ -450,7 +404,6 @@ function setupEventListeners() {
         closeSellModal();
     });
     
-    // Close modals when clicking outside
     window.addEventListener('click', (e) => {
         const buyModal = document.getElementById('buy-modal');
         const sellModal = document.getElementById('sell-modal');
@@ -462,18 +415,14 @@ function setupEventListeners() {
         }
     });
     
-    // Buy form
     document.getElementById('buy-quantity').addEventListener('input', updateBuyForm);
     document.getElementById('confirm-buy-btn').addEventListener('click', handleBuy);
     
-    // Sell form
     document.getElementById('sell-quantity').addEventListener('input', updateSellForm);
     document.getElementById('confirm-sell-btn').addEventListener('click', handleSell);
     
-    // Limit order form
     document.getElementById('create-limit-order-btn').addEventListener('click', createLimitOrder);
     
-    // Order type buttons (Buy/Sell)
     document.getElementById('limit-order-buy-btn').addEventListener('click', () => {
         selectOrderType('buy');
     });
@@ -482,7 +431,6 @@ function setupEventListeners() {
         selectOrderType('sell');
     });
     
-    // Price shortcuts pentru limit orders
     document.getElementById('price-minus-1').addEventListener('click', () => {
         setLimitPriceWithPercent(-1);
     });
@@ -492,7 +440,6 @@ function setupEventListeners() {
     });
 }
 
-// Selectează tipul de order (Buy/Sell)
 function selectOrderType(type) {
     const buyBtn = document.getElementById('limit-order-buy-btn');
     const sellBtn = document.getElementById('limit-order-sell-btn');
@@ -506,13 +453,11 @@ function selectOrderType(type) {
     }
 }
 
-// Obține tipul de order selectat
 function getSelectedOrderType() {
     const buyBtn = document.getElementById('limit-order-buy-btn');
     return buyBtn.classList.contains('active') ? 'buy' : 'sell';
 }
 
-// Funcție pentru alert-uri custom
 function showCustomAlert(message) {
     const alertDiv = document.createElement('div');
     alertDiv.className = 'custom-alert';
@@ -531,7 +476,6 @@ function showCustomAlert(message) {
         animation: slideIn 0.3s ease-out;
     `;
     
-    // Adaugă animație CSS dacă nu există
     if (!document.getElementById('alert-style')) {
         const style = document.createElement('style');
         style.id = 'alert-style';
@@ -564,58 +508,49 @@ function showCustomAlert(message) {
     }, 3000);
 }
 
-// Afișează modalul de buy
 function showBuyModal() {
     if (!selectedCoin) {
-        showCustomAlert('Selectează o monedă mai întâi!');
+        showCustomAlert('Select a coin first!');
         return;
     }
     const modal = document.getElementById('buy-modal');
     modal.classList.add('show');
-    // Reset form
     document.getElementById('buy-quantity').value = '';
     updateBuyForm();
 }
 
-// Închide modalul de buy
 function closeBuyModal() {
     const modal = document.getElementById('buy-modal');
     modal.classList.remove('show');
-    // Reset form
     document.getElementById('buy-quantity').value = '';
     updateBuyForm();
 }
 
-// Afișează modalul de sell
 function showSellModal() {
     if (!selectedCoin) {
-        showCustomAlert('Selectează o monedă mai întâi!');
+        showCustomAlert('Select a coin first!');
         return;
     }
     
     const asset = userAssets.find(a => a.symbol === selectedCoin.CoinInfo.Name);
     if (!asset) {
-        showCustomAlert('Nu ai această monedă în portofel!');
+        showCustomAlert('You don\'t have this coin in your wallet!');
         return;
     }
     
     const modal = document.getElementById('sell-modal');
     modal.classList.add('show');
-    // Reset form
     document.getElementById('sell-quantity').value = '';
     updateSellForm();
 }
 
-// Închide modalul de sell
 function closeSellModal() {
     const modal = document.getElementById('sell-modal');
     modal.classList.remove('show');
-    // Reset form
     document.getElementById('sell-quantity').value = '';
     updateSellForm();
 }
 
-// Actualizează formularul de buy
 function updateBuyForm() {
     const quantity = parseFloat(document.getElementById('buy-quantity').value) || 0;
     const price = parseFloat(document.getElementById('buy-price').value) || 0;
@@ -624,7 +559,6 @@ function updateBuyForm() {
     document.getElementById('buy-total').textContent = `€${formatPrice(total)}`;
 }
 
-// Actualizează formularul de sell
 function updateSellForm() {
     const quantity = parseFloat(document.getElementById('sell-quantity').value) || 0;
     const price = parseFloat(document.getElementById('sell-price').value) || 0;
@@ -633,10 +567,9 @@ function updateSellForm() {
     document.getElementById('sell-total').textContent = `€${formatPrice(total)}`;
 }
 
-// Gestionează cumpărarea
 function handleBuy() {
     if (!selectedCoin) {
-        showCustomAlert('Selectează o monedă!');
+        showCustomAlert('Select a coin!');
         return;
     }
     
@@ -645,22 +578,20 @@ function handleBuy() {
     const total = quantity * price;
     
     if (!quantity || quantity <= 0) {
-        showCustomAlert('Introdu o cantitate validă!');
+        showCustomAlert('Enter a valid quantity!');
         return;
     }
     
     if (currentBalance < total) {
-        showCustomAlert(`Fonduri insuficiente! Ai nevoie de €${formatPrice(total)}, dar ai doar €${formatPrice(currentBalance)}.`);
+        showCustomAlert(`Insufficient funds! You need €${formatPrice(total)}, but you only have €${formatPrice(currentBalance)}.`);
         return;
     }
     
-    // Actualizează balanța
     currentBalance -= total;
     const storageKeys = getStorageKeys();
     localStorage.setItem(storageKeys.balance, currentBalance);
     updateBalanceDisplay();
     
-    // Adaugă sau actualizează asset-ul
     const symbol = selectedCoin.CoinInfo.Name;
     const assetIndex = userAssets.findIndex(a => a.symbol === symbol);
     const rawData = selectedCoin.RAW.EUR;
@@ -691,34 +622,29 @@ function handleBuy() {
         });
     }
     
-    // Folosim aceeași variabilă storageKeys pentru assets
     localStorage.setItem(storageKeys.assets, JSON.stringify(userAssets));
     renderAssetsList();
     
-    // Adaugă în istoric
     addTradeHistory('buy', symbol, quantity, price, total);
     
-    // Reset form și închide modalul
     document.getElementById('buy-quantity').value = '';
     updateBuyForm();
     closeBuyModal();
     
-    // Deschide modalul de verificare
-    openVerifyModal(`Cumpărare reușită! ${quantity} ${symbol} pentru €${formatPrice(total)}`);
+        openVerifyModal(`Purchase successful! ${quantity} ${symbol} for €${formatPrice(total)}`);
 }
 
-// Gestionează vânzarea
 function handleSell() {
     if (!selectedCoin) {
-        showCustomAlert('Selectează o monedă!');
+        showCustomAlert('Select a coin!');
         return;
     }
     
     const symbol = selectedCoin.CoinInfo.Name;
     const asset = userAssets.find(a => a.symbol === symbol);
-    
+        
     if (!asset) {
-        showCustomAlert('Nu ai această monedă în portofel!');
+        showCustomAlert("You don't have this coin in your wallet!");
         return;
     }
     
@@ -727,22 +653,20 @@ function handleSell() {
     const total = quantity * price;
     
     if (!quantity || quantity <= 0) {
-        showCustomAlert('Introdu o cantitate validă!');
+        showCustomAlert('Enter a valid quantity!');
         return;
     }
     
     if (quantity > asset.quantity) {
-        showCustomAlert(`Nu ai suficiente ${symbol}! Disponibil: ${asset.quantity.toFixed(6)}`);
+        showCustomAlert(`You don't have enough ${symbol}! Available: ${asset.quantity.toFixed(6)}`);
         return;
     }
     
-    // Actualizează balanța
     currentBalance += total;
     const storageKeys = getStorageKeys();
     localStorage.setItem(storageKeys.balance, currentBalance);
     updateBalanceDisplay();
     
-    // Actualizează asset-ul
     asset.quantity -= quantity;
     asset.quantity = parseFloat(asset.quantity.toFixed(6));
     
@@ -750,26 +674,21 @@ function handleSell() {
         userAssets = userAssets.filter(a => a.symbol !== symbol);
     }
     
-    // Folosim aceeași variabilă storageKeys pentru assets
     localStorage.setItem(storageKeys.assets, JSON.stringify(userAssets));
     renderAssetsList();
     
-    // Adaugă în istoric
     addTradeHistory('sell', symbol, quantity, price, total);
     
-    // Reset form și închide modalul
     document.getElementById('sell-quantity').value = '';
     updateSellForm();
     closeSellModal();
     
-    // Deschide modalul de verificare
-    openVerifyModal(`Vânzare reușită! ${quantity} ${symbol} pentru €${formatPrice(total)}`);
+    openVerifyModal(`Sale successful! ${quantity} ${symbol} for €${formatPrice(total)}`);
 }
 
-// Creează limit order
 function createLimitOrder() {
     if (!selectedCoin) {
-        showCustomAlert('Selectează o monedă!');
+        showCustomAlert('Select a coin!');
         return;
     }
     
@@ -779,29 +698,27 @@ function createLimitOrder() {
     const symbol = selectedCoin.CoinInfo.Name;
     
     if (!quantity || quantity <= 0) {
-        showCustomAlert('Introdu o cantitate validă!');
+        showCustomAlert('Enter a valid quantity!');
         return;
     }
     
     if (!limitPrice || limitPrice <= 0) {
-        showCustomAlert('Introdu un preț limit valid!');
+        showCustomAlert('Enter a valid limit price!');
         return;
     }
     
-    // Verificări pentru sell orders
     if (type === 'sell') {
         const asset = userAssets.find(a => a.symbol === symbol);
         if (!asset || asset.quantity < quantity) {
-            showCustomAlert(`Nu ai suficiente ${symbol}!`);
+            showCustomAlert(`You don't have enough ${symbol}!`);
             return;
         }
     }
     
-    // Verificări pentru buy orders
     if (type === 'buy') {
         const total = quantity * limitPrice;
         if (currentBalance < total) {
-            showCustomAlert(`Fonduri insuficiente! Ai nevoie de €${formatPrice(total)}.`);
+            showCustomAlert(`Insufficient funds! You need €${formatPrice(total)}.`);
             return;
         }
     }
@@ -814,25 +731,22 @@ function createLimitOrder() {
         limitPrice: limitPrice,
         createdAt: new Date().toISOString(),
         status: 'pending',
-        currentPriceAtCreation: window.currentCoinPrice || selectedCoin.RAW.EUR.PRICE // Prețul curent când s-a creat order-ul
+        currentPriceAtCreation: window.currentCoinPrice || selectedCoin.RAW.EUR.PRICE
     };
     
     limitOrders.push(order);
     saveLimitOrders();
     renderPendingOrders();
     
-    // Reset form
     document.getElementById('limit-quantity').value = '';
     document.getElementById('limit-price').value = '';
 }
 
-// Salvează limit orders
 function saveLimitOrders() {
     const storageKeys = getStorageKeys();
     localStorage.setItem(storageKeys.limitOrders, JSON.stringify(limitOrders));
 }
 
-// Încarcă limit orders
 function loadLimitOrders() {
     const storageKeys = getStorageKeys();
     const stored = localStorage.getItem(storageKeys.limitOrders);
@@ -844,7 +758,6 @@ function loadLimitOrders() {
     renderPendingOrders();
 }
 
-// Renderizează orderele în așteptare
 function renderPendingOrders() {
     const list = document.getElementById('pending-orders-list');
     if (!list) return;
@@ -854,7 +767,7 @@ function renderPendingOrders() {
     const pendingOrders = limitOrders.filter(o => o.status === 'pending');
     
     if (pendingOrders.length === 0) {
-        list.innerHTML = '<p style="color: #8B949E; text-align: center; padding: 20px;">Nu ai ordere în așteptare</p>';
+        list.innerHTML = '<p style="color: #8B949E; text-align: center; padding: 20px;">You have no pending orders</p>';
         return;
     }
     
@@ -868,7 +781,7 @@ function renderPendingOrders() {
                 <div class="order-price">€${formatPrice(order.limitPrice)}</div>
                 <div class="order-quantity">${order.quantity.toFixed(6)} ${order.symbol}</div>
             </div>
-            <button class="cancel-order-btn" data-order-id="${order.id}">Anulează</button>
+            <button class="cancel-order-btn" data-order-id="${order.id}">Cancel</button>
         `;
         
         orderItem.querySelector('.cancel-order-btn').addEventListener('click', () => {
@@ -879,14 +792,12 @@ function renderPendingOrders() {
     });
 }
 
-// Anulează limit order
 function cancelLimitOrder(orderId) {
     limitOrders = limitOrders.filter(o => o.id !== orderId);
     saveLimitOrders();
     renderPendingOrders();
 }
 
-// Adaugă în istoricul de tranzacții
 function addTradeHistory(type, symbol, quantity, price, total) {
     const trade = {
         id: Date.now(),
@@ -900,7 +811,6 @@ function addTradeHistory(type, symbol, quantity, price, total) {
     
     tradeHistory.unshift(trade);
     
-    // Păstrăm doar ultimele 50 de tranzacții
     if (tradeHistory.length > 50) {
         tradeHistory = tradeHistory.slice(0, 50);
     }
@@ -909,13 +819,11 @@ function addTradeHistory(type, symbol, quantity, price, total) {
     renderTradeHistory();
 }
 
-// Salvează istoricul de tranzacții
 function saveTradeHistory() {
     const storageKeys = getStorageKeys();
     localStorage.setItem(storageKeys.tradeHistory, JSON.stringify(tradeHistory));
 }
 
-// Încarcă istoricul de tranzacții
 function loadTradeHistory() {
     const storageKeys = getStorageKeys();
     const stored = localStorage.getItem(storageKeys.tradeHistory);
@@ -927,7 +835,6 @@ function loadTradeHistory() {
     renderTradeHistory();
 }
 
-// Renderizează istoricul de tranzacții
 function renderTradeHistory() {
     const list = document.getElementById('trade-history-list');
     if (!list) return;
@@ -935,7 +842,7 @@ function renderTradeHistory() {
     list.innerHTML = '';
     
     if (tradeHistory.length === 0) {
-        list.innerHTML = '<p style="color: #8B949E; text-align: center; padding: 20px;">Nu ai tranzacții</p>';
+        list.innerHTML = '<p style="color: #8B949E; text-align: center; padding: 20px;">You have no transactions</p>';
         return;
     }
     
@@ -969,15 +876,12 @@ function renderTradeHistory() {
     });
 }
 
-// Pornește monitorizarea prețurilor pentru limit orders
 function startPriceMonitoring() {
-    // Verifică limit orders la fiecare 5 secunde
     priceUpdateInterval = setInterval(() => {
         checkLimitOrders();
     }, 5000);
 }
 
-// Verifică și execută limit orders
 async function checkLimitOrders() {
     if (limitOrders.length === 0) return;
     
@@ -995,11 +899,9 @@ async function checkLimitOrders() {
             const currentPrice = coin.RAW.EUR.PRICE;
             const priceAtCreation = order.currentPriceAtCreation;
             
-            // Verificăm dacă order-ul a fost creat recent (în ultimele 30 secunde)
             const orderAge = Date.now() - order.id;
-            const isRecentlyCreated = orderAge < 30000; // 30 secunde
+            const isRecentlyCreated = orderAge < 30000;
             
-            // Logging pentru debugging
             console.log(`[Order Check] ${order.type.toUpperCase()} ${order.symbol}:`, {
                 limitPrice: order.limitPrice,
                 currentPrice: currentPrice,
@@ -1008,63 +910,47 @@ async function checkLimitOrders() {
                 isRecent: isRecentlyCreated
             });
             
-            // Determinăm direcția order-ului față de prețul de la creare
             const isBuyAboveCreation = order.type === 'buy' && order.limitPrice > priceAtCreation;
             const isSellBelowCreation = order.type === 'sell' && order.limitPrice < priceAtCreation;
             
-            // Pentru buy orders cu preț limit MAI MARE decât prețul de la creare (ex: +1%)
-            // Execută când prețul CREȘTE și ajunge la preț limit
             if (isBuyAboveCreation) {
                 if (currentPrice >= order.limitPrice) {
                     executeLimitOrder(order, currentPrice);
                 }
             }
-            // Pentru buy orders cu preț limit MAI MIC decât prețul de la creare (ex: -1%)
-            // Execută când prețul SCADE și ajunge la preț limit
             else if (order.type === 'buy' && order.limitPrice <= priceAtCreation) {
-                // Prevenim execuția imediată pentru order-uri recent create
                 if (isRecentlyCreated && priceAtCreation) {
                     const priceChangePercent = Math.abs((currentPrice - priceAtCreation) / priceAtCreation) * 100;
-                    // Blocăm execuția dacă prețul nu s-a schimbat cu cel puțin 0.1%
                     if (priceChangePercent < 0.1 && currentPrice <= order.limitPrice) {
                         return;
                     }
                 }
-                // Execută când prețul scade la sau sub prețul limit
                 if (currentPrice <= order.limitPrice) {
                     executeLimitOrder(order, currentPrice);
                 }
             }
-            // Pentru sell orders cu preț limit MAI MIC decât prețul de la creare (ex: -1%)
-            // Execută când prețul SCADE și ajunge la preț limit
             else if (isSellBelowCreation) {
                 if (currentPrice <= order.limitPrice) {
                     executeLimitOrder(order, currentPrice);
                 }
             }
-            // Pentru sell orders cu preț limit MAI MARE decât prețul de la creare (ex: +1%)
-            // Execută când prețul CREȘTE și ajunge la preț limit
             else if (order.type === 'sell' && order.limitPrice >= priceAtCreation) {
-                // Prevenim execuția imediată pentru order-uri recent create
                 if (isRecentlyCreated && priceAtCreation) {
                     const priceChangePercent = Math.abs((currentPrice - priceAtCreation) / priceAtCreation) * 100;
-                    // Blocăm execuția dacă prețul nu s-a schimbat cu cel puțin 0.1%
                     if (priceChangePercent < 0.1 && currentPrice >= order.limitPrice) {
                         return;
                     }
                 }
-                // Execută când prețul crește la sau peste prețul limit
                 if (currentPrice >= order.limitPrice) {
                     executeLimitOrder(order, currentPrice);
                 }
             }
         });
     } catch (error) {
-        console.error('Eroare la verificarea limit orders:', error);
+        console.error('Error at checking limit orders:', error);
     }
 }
 
-// Execută un limit order
 function executeLimitOrder(order, currentPrice) {
     console.log(`[Order Execution] Executing ${order.type.toUpperCase()} order for ${order.symbol} at €${currentPrice.toFixed(2)}`);
     
@@ -1074,13 +960,11 @@ function executeLimitOrder(order, currentPrice) {
         const total = order.quantity * order.limitPrice;
         
         if (currentBalance >= total) {
-            // Actualizează balanța
             currentBalance -= total;
             const storageKeys = getStorageKeys();
             localStorage.setItem(storageKeys.balance, currentBalance);
             updateBalanceDisplay();
             
-            // Adaugă sau actualizează asset-ul
             const assetIndex = userAssets.findIndex(a => a.symbol === symbol);
             const coin = allMarketData.find(c => c.CoinInfo.Name === symbol);
             
@@ -1109,21 +993,17 @@ function executeLimitOrder(order, currentPrice) {
                 });
             }
             
-            // Folosim aceeași variabilă storageKeys pentru assets (deja declarată mai sus)
             localStorage.setItem(storageKeys.assets, JSON.stringify(userAssets));
             renderAssetsList();
             
-            // Adaugă în istoric
             addTradeHistory('buy', symbol, order.quantity, order.limitPrice, total);
             
-            // Marchează order-ul ca executat
             order.status = 'executed';
             order.executedAt = new Date().toISOString();
             order.executedPrice = currentPrice;
             saveLimitOrders();
             renderPendingOrders();
             
-            // Notificare de succes
             showCustomAlert(`✓ Order BUY executat! ${order.quantity} ${symbol} la €${formatPrice(currentPrice)}`);
         }
     } else if (order.type === 'sell') {
@@ -1132,13 +1012,11 @@ function executeLimitOrder(order, currentPrice) {
         if (asset && asset.quantity >= order.quantity) {
             const total = order.quantity * order.limitPrice;
             
-            // Actualizează balanța
             currentBalance += total;
             const storageKeys = getStorageKeys();
             localStorage.setItem(storageKeys.balance, currentBalance);
             updateBalanceDisplay();
             
-            // Actualizează asset-ul
             asset.quantity -= order.quantity;
             asset.quantity = parseFloat(asset.quantity.toFixed(6));
             
@@ -1146,27 +1024,22 @@ function executeLimitOrder(order, currentPrice) {
                 userAssets = userAssets.filter(a => a.symbol !== symbol);
             }
             
-            // Folosim aceeași variabilă storageKeys pentru assets
             localStorage.setItem(storageKeys.assets, JSON.stringify(userAssets));
             renderAssetsList();
             
-            // Adaugă în istoric
             addTradeHistory('sell', symbol, order.quantity, order.limitPrice, total);
             
-            // Marchează order-ul ca executat
             order.status = 'executed';
             order.executedAt = new Date().toISOString();
             order.executedPrice = currentPrice;
             saveLimitOrders();
             renderPendingOrders();
             
-            // Notificare de succes
             showCustomAlert(`✓ Order SELL executat! ${order.quantity} ${symbol} la €${formatPrice(currentPrice)}`);
         }
     }
 }
 
-// Modal de verificare
 function openVerifyModal(successMessage) {
     const modal = document.getElementById('verifyModal');
     const loader = document.getElementById('verify-loader');
@@ -1174,27 +1047,22 @@ function openVerifyModal(successMessage) {
     const message = document.getElementById('verify-message');
     
     if (!modal || !loader || !icon || !message) {
-        console.error('Elementele modalului de verificare nu au fost găsite!');
+        console.error('The verification modal elements were not found!');
         return;
     }
     
-    // Resetăm starea modalului
     loader.style.display = 'flex';
     icon.style.display = 'none';
-    message.textContent = 'Procesăm tranzacția. Te rugăm să aștepți...';
-    
-    // Afișăm modalul
+    message.textContent = 'We are processing the transaction. Please wait...';
+
     modal.style.display = 'flex';
     modal.classList.add('show');
     
-    // Simulăm procesarea (3 secunde)
     setTimeout(() => {
-        // Ascundem loader-ul și afișăm iconița de succes
         loader.style.display = 'none';
         icon.style.display = 'flex';
         message.textContent = successMessage;
         
-        // Închidem modalul după 2 secunde
         setTimeout(() => {
             closeVerifyModal();
         }, 2000);
@@ -1209,15 +1077,13 @@ function closeVerifyModal() {
     }
 }
 
-// Auto-selectează o monedă bazat pe parametrul URL
 function autoSelectCoin(symbol) {
     const optionsContainer = document.getElementById('trade-coin-select-options');
     if (!optionsContainer) {
-        console.warn('Dropdown-ul nu este gata încă');
+        console.warn('The dropdown is not ready yet');
         return;
     }
     
-    // Găsește opțiunea cu simbolul cerut
     const options = optionsContainer.querySelectorAll('.custom-coin-dropdown-option');
     let foundOption = null;
     
@@ -1229,15 +1095,13 @@ function autoSelectCoin(symbol) {
     });
     
     if (foundOption) {
-        // Trigger click pe opțiune pentru a selecta moneda
         foundOption.click();
-        console.log(`Auto-selectat moneda: ${symbol}`);
+        console.log(`Auto-selected coin: ${symbol}`);
     } else {
-        console.warn(`Moneda ${symbol} nu a fost găsită în listă`);
+        console.warn(`Coin ${symbol} was not found in the list`);
     }
 }
 
-// Cleanup la închiderea paginii
 window.addEventListener('beforeunload', () => {
     if (priceUpdateInterval) {
         clearInterval(priceUpdateInterval);

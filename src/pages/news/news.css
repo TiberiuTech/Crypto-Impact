@@ -20,7 +20,6 @@
     color: #8B949E;
 }
 
-/* Filtre */
 .news-filters {
     display: flex;
     justify-content: center;
@@ -53,7 +52,6 @@
     border-color: #238636;
 }
 
-/* Loading */
 .loading-container {
     text-align: center;
     padding: 60px 20px;
@@ -78,7 +76,6 @@
     font-size: 16px;
 }
 
-/* Grid de știri - 3 pe rând */
 .news-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
@@ -86,7 +83,6 @@
     margin-bottom: 40px;
 }
 
-/* Card-uri de știri */
 .news-card {
     background: #161B22;
     border: 1px solid #30363D;
@@ -153,6 +149,7 @@
     line-height: 1.4;
     display: -webkit-box;
     -webkit-line-clamp: 3;
+    line-clamp: 3;
     -webkit-box-orient: vertical;
     overflow: hidden;
 }
@@ -165,6 +162,7 @@
     flex: 1;
     display: -webkit-box;
     -webkit-line-clamp: 3;
+    line-clamp: 3;
     -webkit-box-orient: vertical;
     overflow: hidden;
 }
@@ -213,7 +211,6 @@
     font-size: 16px;
 }
 
-/* Mesaj de eroare */
 .error-message {
     text-align: center;
     padding: 60px 20px;
@@ -246,7 +243,6 @@
     background: #2EA043;
 }
 
-/* Responsive */
 @media (max-width: 1200px) {
     .news-grid {
         grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));

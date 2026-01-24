@@ -1,18 +1,13 @@
-/* =========================================================================
- * NAVIGARE (NAVBAR) - Stiluri specifice meniului de sus
- * ========================================================================= */
 .navbar {
     background-color: #0D1117; 
-    /* MODIFICARE: Adăugăm padding sus și jos pentru a crea spațiu vertical */
     padding: 10px 30px; 
     width: 100%;
     height: auto;
     display: flex;
     align-items: center; 
     
-    /* MODIFICARE: Asigurăm spațiu între elemente (link-uri centrate, auth-links dreapta) */
     justify-content: space-between; 
-    position: relative; /* Necesar pentru ca .nav-links absolute să funcționeze */
+    position: relative; 
 }
 
 .nav-links {
@@ -23,14 +18,12 @@
     overflow: hidden;
     gap: 2px;
     
-    /* MODIFICARE CRITICĂ: Soluție pentru centrare absolută */
     position: absolute;
     left: 50%;
     transform: translateX(-50%);
     
-    /* NOU: Corectăm vizual poziția verticală în centrul navbar-ului */
     top: 50%; 
-    transform: translate(-50%, -50%); /* Centrare perfectă verticală și orizontală */
+    transform: translate(-50%, -50%); 
 }
 
 .nav-links li a {
@@ -44,7 +37,6 @@
     overflow: hidden; 
 }
 
-/* Linia de evidențiere (Hover & Active) */
 .nav-links li a::after {
     content: ''; 
     position: absolute;
@@ -67,13 +59,11 @@
     font-weight: bold;
 }
 
-/* Stiluri pentru link-urile de Autentificare (Login/Înregistrare) */
 .auth-links {
     display: flex;
     align-items: center;
     gap: 10px;
     
-    /* Ne asigurăm că .auth-links se aliniază la centrul vertical, profitând de padding-ul nou adăugat la .navbar */
     margin-left: auto; 
 }
 
@@ -87,7 +77,7 @@
 }
 
 .login-btn {
-    color: #8B949E; /* Text gri */
+    color: #8B949E; 
     border: 1px solid transparent;
 }
 
@@ -96,7 +86,7 @@
 }
 
 .register-btn {
-    background-color: #FF5733; /* Portocaliu */
+    background-color: #FF5733; 
     color: white;
 }
 
@@ -104,7 +94,6 @@
     background-color: #e54d2a;
 }
 
-/* Stiluri pentru utilizator autentificat */
 .user-info-navbar {
     display: flex;
     align-items: center;

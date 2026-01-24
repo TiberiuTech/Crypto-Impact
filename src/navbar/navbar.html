@@ -1,6 +1,6 @@
 <nav class="navbar">
     <ul class="nav-links">
-        <li><a href="/src/index.html">Acasă</a></li>
+        <li><a href="/src/pages/home/home.html">Home</a></li>
         <li><a href="/src/pages/news/news.html">News</a></li>
         <li><a href="/src/pages/prices/prices.html">Prices</a></li>
         <li><a href="/src/pages/orionix/orionix.html">Orionix</a></li>
@@ -8,14 +8,11 @@
         <li><a href="/src/pages/trade/trade.html">Trade</a></li>
     </ul>
 
-    <!-- Secțiune de autentificare (Login/Register sau User/Logout), aliniată în dreapta de navbar.css -->
     <div class="auth-links" id="auth-links">
-        <!-- Butoanele Login/Register (afișate când utilizatorul NU este autentificat) -->
         <div class="auth-buttons" id="auth-buttons">
             <a href="/src/pages/auth/login.html" class="auth-button login-btn">Login</a>
-            <a href="/src/pages/auth/register.html" class="auth-button register-btn">Înregistrare</a>
+            <a href="/src/pages/auth/register.html" class="auth-button register-btn">Register</a>
         </div>
-        <!-- Informații utilizator (afișate când utilizatorul ESTE autentificat) -->
         <div class="user-info-navbar" id="user-info-navbar" style="display: none;">
             <span class="user-name" id="user-name-navbar"></span>
             <button class="auth-button logout-btn" id="logout-btn">Logout</button>

@@ -1,4 +1,3 @@
-// Configurația Firebase
 const firebaseConfig = {
   apiKey: "AIzaSyCUBaBkHSTdHmKdIfZCezkpA-I8edvdzew",
   authDomain: "licenta-27ed8.firebaseapp.com",
@@ -9,69 +8,58 @@ const firebaseConfig = {
   measurementId: "G-H97EH5Q57V"
 };
 
-// Verificăm dacă utilizatorul este deja autentificat
 (function checkIfAlreadyAuthenticated() {
     const userData = localStorage.getItem('user');
     if (userData) {
         try {
             const user = JSON.parse(userData);
             if (user.uid && user.email) {
-                // Utilizatorul este deja autentificat - redirecționăm către home
-                console.log('Utilizator deja autentificat. Redirecționare către home...');
+                console.log('User already authenticated. Redirecting to home...');
                 window.location.href = '/src/pages/home/home.html';
                 return;
             }
         } catch (error) {
-            // Date invalide - continuăm la login
             localStorage.removeItem('user');
         }
     }
 })();
 
-// Declarăm auth global
 let auth;
 
-// Funcție pentru inițializarea Firebase
 function initializeFirebase() {
     if (typeof firebase === 'undefined') {
-        console.error('Firebase SDK nu este încărcat! Verifică scripturile din HTML.');
+        console.error('Firebase SDK not loaded! Check the scripts in HTML.');
         return false;
     }
     
     try {
-        // Verificăm dacă Firebase este deja inițializat
         let app;
         try {
             app = firebase.app();
-            console.log('Firebase deja inițializat');
+            console.log('Firebase already initialized');
         } catch (e) {
-            // Nu există app inițializat, inițializăm
-            console.log('Inițializăm Firebase...');
+            console.log('Initializing Firebase...');
             app = firebase.initializeApp(firebaseConfig);
-            console.log('Firebase inițializat cu succes');
+            console.log('Firebase initialized successfully');
         }
         auth = firebase.auth();
-        console.log('Firebase Auth inițializat');
+        console.log('Firebase Auth initialized');
         return true;
     } catch (error) {
-        console.error('Eroare la inițializarea Firebase:', error);
+        console.error('Error at initializing Firebase:', error);
         return false;
     }
 }
 
-// Inițializăm Firebase când DOM-ul este gata
 document.addEventListener('DOMContentLoaded', function() {
-    // Așteptăm puțin pentru a ne asigura că Firebase SDK este încărcat
     setTimeout(() => {
         if (!initializeFirebase()) {
-            console.error('Nu s-a putut inițializa Firebase!');
+            console.error('Error at initializing Firebase!');
         }
     }, 100);
 });
 
-// Așteptăm ca Firebase să fie inițializat înainte de a continua
 document.addEventListener('DOMContentLoaded', () => {
-    // Așteptăm puțin mai mult pentru a ne asigura că Firebase este gata
     setTimeout(() => {
         setupLoginForm();
     }, 200);
@@ -84,7 +72,6 @@ function setupLoginForm() {
     const emailError = document.getElementById('email-error');
     const passwordError = document.getElementById('password-error');
 
-    // Funcție pentru afișarea erorilor
     function showError(element, message) {
         element.textContent = message;
         element.style.display = 'block';
@@ -95,17 +82,14 @@ function setupLoginForm() {
         element.style.display = 'none';
     }
 
-    // Validare email
     function validateEmail(email) {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         return emailRegex.test(email);
     }
 
-    // Handler pentru submit formular
     loginForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         
-        // Curățăm erorile anterioare
         clearError(emailError);
         clearError(passwordError);
         emailInput.classList.remove('error');
@@ -116,20 +100,18 @@ function setupLoginForm() {
 
         let hasErrors = false;
 
-        // Validare email
         if (!email) {
-            showError(emailError, 'Email-ul este obligatoriu');
+            showError(emailError, 'Email is required');
             emailInput.classList.add('error');
             hasErrors = true;
         } else if (!validateEmail(email)) {
-            showError(emailError, 'Email-ul trebuie să conțină @ și un domeniu valid');
+            showError(emailError, 'Email must contain @ and a valid domain');
             emailInput.classList.add('error');
             hasErrors = true;
         }
 
-        // Validare parolă
         if (!password) {
-            showError(passwordError, 'Parola este obligatorie');
+            showError(passwordError, 'Password is required');
             passwordInput.classList.add('error');
             hasErrors = true;
         }
@@ -138,64 +120,57 @@ function setupLoginForm() {
             return;
         }
 
-        // Verificăm dacă auth este disponibil
         if (!auth) {
-            showError(passwordError, 'Firebase nu este inițializat corect. Reîncarcă pagina.');
+            showError(passwordError, 'Firebase not initialized correctly. Reload the page.');
             return;
         }
 
-        // Încercăm autentificarea
         try {
             const userCredential = await auth.signInWithEmailAndPassword(email, password);
             const user = userCredential.user;
             
-            // Salvez informațiile utilizatorului în localStorage
             const userData = {
                 uid: user.uid,
                 email: user.email
             };
             
-            // Adăugăm displayName dacă există
             if (user.displayName) {
                 userData.displayName = user.displayName;
             }
             
             localStorage.setItem('user', JSON.stringify(userData));
 
-            // Actualizăm navbar-ul dacă funcția există
             if (typeof updateNavbarAuthState === 'function') {
                 updateNavbarAuthState();
             }
 
-            // Redirecționăm către pagina principală
             window.location.href = '/src/pages/home/home.html';
         } catch (error) {
-            console.error('Eroare la autentificare:', error);
+            console.error('Error at authentication:', error);
             
-            // Gestionăm erorile Firebase
             let errorMessage = '';
             switch (error.code) {
                 case 'auth/api-key-not-valid':
                 case 'auth/api-key-not-valid.-please-pass-a-valid-api-key.':
-                    errorMessage = 'API key Firebase invalid. Verifică configurația în consolă Firebase și asigură-te că Authentication este activat.';
+                    errorMessage = 'API key Firebase invalid. Check the Firebase console and ensure Authentication is activated.';
                     break;
                 case 'auth/user-not-found':
-                    errorMessage = 'Contul nu există. Te rugăm să te înregistrezi mai întâi.';
+                    errorMessage = 'Account does not exist. Please register first.';
                     break;
                 case 'auth/wrong-password':
-                    errorMessage = 'Parolă incorectă.';
+                    errorMessage = 'Incorrect password.';
                     break;
                 case 'auth/invalid-email':
                     errorMessage = 'Email invalid.';
                     break;
                 case 'auth/invalid-credential':
-                    errorMessage = 'Email sau parolă incorectă.';
+                    errorMessage = 'Email or password incorrect.';
                     break;
                 case 'auth/too-many-requests':
-                    errorMessage = 'Prea multe încercări. Te rugăm să încerci mai târziu.';
+                    errorMessage = 'Too many requests. Please try again later.';
                     break;
                 default:
-                    errorMessage = `Eroare la autentificare: ${error.message || 'Te rugăm să încerci din nou.'}`;
+                    errorMessage = `Error at authentication: ${error.message || 'Please try again.'}`;
             }
             
             showError(passwordError, errorMessage);

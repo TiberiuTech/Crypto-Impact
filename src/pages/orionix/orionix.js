@@ -1,9 +1,7 @@
-// Variabile globale
 let web3;
 let userAccount;
 let currentToken = null;
 
-// Demo Token Data
 let demoToken = {
     price: 1.25,
     change24h: 5.43,
@@ -18,7 +16,6 @@ let demoToken = {
 let chartInstance = null;
 let priceUpdateInterval = null;
 
-// ABI minimal pentru ERC-20
 const ERC20_ABI = [
     {
         "constant": true,
@@ -70,22 +67,18 @@ const ERC20_ABI = [
     }
 ];
 
-// Inițializare
 document.addEventListener('DOMContentLoaded', () => {
     initializeDemoToken();
     checkMetaMask();
     setupEventListeners();
 });
 
-// Inițializează demo token
 function initializeDemoToken() {
-    // Generează istoric de prețuri inițial (static)
     const now = Date.now();
     const basePrice = 1.25;
     
     for (let i = 100; i >= 0; i--) {
-        const timestamp = now - i * 60000; // Date la fiecare minut
-        // Generează variație sinusoidală pentru aspect realist
+        const timestamp = now - i * 60000;
         const wave = Math.sin(i / 10) * 0.05;
         const randomNoise = (Math.random() - 0.5) * 0.02;
         const price = basePrice + wave + randomNoise;
@@ -98,11 +91,8 @@ function initializeDemoToken() {
     
     updateDemoTokenDisplay();
     renderDemoChart();
-    // Nu pornim actualizarea automată
-    // startPriceSimulation();
 }
 
-// Actualizează afișajul demo token
 function updateDemoTokenDisplay() {
     document.getElementById('orx-price').textContent = `$${demoToken.price.toFixed(4)}`;
     document.getElementById('orx-current-price').textContent = `$${demoToken.price.toFixed(4)}`;
@@ -118,7 +108,6 @@ function updateDemoTokenDisplay() {
     document.getElementById('orx-low').textContent = `$${demoToken.low24h.toFixed(4)}`;
 }
 
-// Formatare număr
 function formatNumber(num) {
     if (num >= 1000000) {
         return (num / 1000000).toFixed(2) + 'M';
@@ -128,13 +117,12 @@ function formatNumber(num) {
     return num.toFixed(2);
 }
 
-// Renderizează graficul demo
 function renderDemoChart() {
     const chartElement = document.getElementById('orx-chart');
     
     const options = {
         series: [{
-            name: 'Preț ORX',
+            name: 'ORX Price',
             data: demoToken.priceHistory
         }],
         chart: {
@@ -207,38 +195,26 @@ function renderDemoChart() {
     chartInstance.render();
 }
 
-// Simulare actualizare preț în timp real (OPRIT - doar la click pe butoane)
-function startPriceSimulation() {
-    // Funcția este disponibilă dar nu pornim intervalul automat
-    // Actualizările se fac doar când utilizatorul apasă butoanele
-}
-
-// Simulează creștere preț
 function simulatePriceIncrease() {
-    const newPrice = parseFloat((demoToken.price * 1.1).toFixed(4)); // Creștere 10%
+    const newPrice = parseFloat((demoToken.price * 1.1).toFixed(4));
     demoToken.price = newPrice;
     demoToken.change24h = parseFloat((demoToken.change24h + 10).toFixed(2));
     
-    // Actualizează high dacă e cazul
     if (newPrice > demoToken.high24h) {
         demoToken.high24h = newPrice;
     }
     
-    // Actualizează market cap
     demoToken.marketCap = newPrice * demoToken.supply;
     
-    // Adaugă punct nou în grafic
     demoToken.priceHistory.push({
         x: Date.now(),
         y: newPrice
     });
     
-    // Păstrează doar ultimele 100 de puncte
     if (demoToken.priceHistory.length > 100) {
         demoToken.priceHistory.shift();
     }
     
-    // Actualizează graficul
     if (chartInstance) {
         chartInstance.updateSeries([{
             data: demoToken.priceHistory
@@ -246,35 +222,29 @@ function simulatePriceIncrease() {
     }
     
     updateDemoTokenDisplay();
-    showAlert('Preț crescut cu 10%! 📈', 'success');
+    showAlert('Price increased by 10%!', 'success');
 }
 
-// Simulează scădere preț
 function simulatePriceDecrease() {
-    const newPrice = parseFloat((demoToken.price * 0.9).toFixed(4)); // Scădere 10%
+    const newPrice = parseFloat((demoToken.price * 0.9).toFixed(4));
     demoToken.price = newPrice;
     demoToken.change24h = parseFloat((demoToken.change24h - 10).toFixed(2));
     
-    // Actualizează low dacă e cazul
     if (newPrice < demoToken.low24h) {
         demoToken.low24h = newPrice;
     }
     
-    // Actualizează market cap
     demoToken.marketCap = newPrice * demoToken.supply;
     
-    // Adaugă punct nou în grafic
     demoToken.priceHistory.push({
         x: Date.now(),
         y: newPrice
     });
     
-    // Păstrează doar ultimele 100 de puncte
     if (demoToken.priceHistory.length > 100) {
         demoToken.priceHistory.shift();
     }
     
-    // Actualizează graficul
     if (chartInstance) {
         chartInstance.updateSeries([{
             data: demoToken.priceHistory
@@ -282,10 +252,9 @@ function simulatePriceDecrease() {
     }
     
     updateDemoTokenDisplay();
-    showAlert('Preț scăzut cu 10%! 📉', 'info');
+    showAlert('Price decreased by 10%!', 'info');
 }
 
-// Reset preț
 function resetPrice() {
     demoToken.price = 1.25;
     demoToken.change24h = 5.43;
@@ -294,7 +263,6 @@ function resetPrice() {
     demoToken.marketCap = 1250000;
     demoToken.volume24h = 345678;
     
-    // Regenerează istoricul de prețuri
     demoToken.priceHistory = [];
     const now = Date.now();
     const basePrice = 1.25;
@@ -311,7 +279,6 @@ function resetPrice() {
         });
     }
     
-    // Actualizează graficul
     if (chartInstance) {
         chartInstance.updateSeries([{
             data: demoToken.priceHistory
@@ -319,62 +286,54 @@ function resetPrice() {
     }
     
     updateDemoTokenDisplay();
-    showAlert('Preț resetat! 🔄', 'success');
+    showAlert('Price reset!', 'success');
 }
 
-// Verifică dacă MetaMask este instalat
 async function checkMetaMask() {
     const statusIndicator = document.getElementById('status-indicator');
     const statusText = document.getElementById('status-text');
     
     if (typeof window.ethereum !== 'undefined') {
         statusIndicator.classList.add('connected');
-        statusText.textContent = 'MetaMask detectat';
+            statusText.textContent = 'MetaMask detected';
         
-        // Încarcă Web3 din CDN
         try {
-            // Verifică dacă Web3 este deja încărcat
             if (typeof window.Web3 === 'undefined') {
-                // Încarcă scriptul Web3
                 await loadWeb3Script();
             }
             
-            // Creează instanță Web3
             web3 = new window.Web3(window.ethereum);
             
-            // Conectare automată
             const accounts = await window.ethereum.request({ method: 'eth_accounts' });
             if (accounts.length > 0) {
                 userAccount = accounts[0];
-                statusText.textContent = `Conectat: ${userAccount.substring(0, 6)}...${userAccount.substring(38)}`;
+                statusText.textContent = `Connected: ${userAccount.substring(0, 6)}...${userAccount.substring(38)}`;
             } else {
-                statusText.textContent = 'MetaMask detectat - Click pentru conectare';
+                statusText.textContent = 'MetaMask detected - Click for connection';
                 statusIndicator.classList.remove('connected');
                 statusIndicator.classList.add('disconnected');
             }
         } catch (error) {
-            console.error('Eroare la încărcarea Web3:', error);
-            showAlert('Eroare la încărcarea Web3', 'error');
+            console.error('Error at loading Web3:', error);
+            showAlert('Error at loading Web3', 'error');
         }
     } else {
         statusIndicator.classList.add('disconnected');
-        statusText.textContent = 'MetaMask nu este instalat';
-        showAlert('Te rugăm să instalezi MetaMask pentru a folosi această funcționalitate', 'error');
+        statusText.textContent = 'MetaMask is not installed';
+        showAlert('Please install MetaMask to use this functionality', 'error');
     }
 }
 
-// Funcție helper pentru încărcarea scriptului Web3
 function loadWeb3Script() {
     return new Promise((resolve, reject) => {
         const script = document.createElement('script');
         script.src = 'https://cdn.jsdelivr.net/npm/web3@1.8.0/dist/web3.min.js';
         script.onload = () => resolve();
-        script.onerror = () => reject(new Error('Nu s-a putut încărca Web3'));
+                script.onerror = () => reject(new Error('Could not load Web3'));
         document.head.appendChild(script);
     });
 }
 
-// Conectare la MetaMask
 async function connectMetaMask() {
     try {
         const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
@@ -385,53 +344,45 @@ async function connectMetaMask() {
         
         statusIndicator.classList.remove('disconnected');
         statusIndicator.classList.add('connected');
-        statusText.textContent = `Conectat: ${userAccount.substring(0, 6)}...${userAccount.substring(38)}`;
+        statusText.textContent = `Connected: ${userAccount.substring(0, 6)}...${userAccount.substring(38)}`;
         
-        showAlert('Conectat cu succes!', 'success');
+        showAlert('Connected successfully!', 'success');
     } catch (error) {
-        console.error('Eroare la conectare:', error);
-        showAlert('Eroare la conectare la MetaMask', 'error');
+        console.error('Error at connecting:', error);
+        showAlert('Error at connecting to MetaMask', 'error');
     }
 }
 
-// Setup event listeners
 function setupEventListeners() {
-    // Demo token buttons
     document.getElementById('simulate-buy-btn').addEventListener('click', simulatePriceIncrease);
     document.getElementById('simulate-sell-btn').addEventListener('click', simulatePriceDecrease);
     document.getElementById('reset-price-btn').addEventListener('click', resetPrice);
     
-    // Conectare MetaMask la click pe status
     document.getElementById('metamask-status').addEventListener('click', () => {
         if (!userAccount) {
             connectMetaMask();
         }
     });
     
-    // Butonul "Conectează MetaMask" face același lucru ca și status
     document.getElementById('load-token-btn').addEventListener('click', () => {
         if (!userAccount) {
             connectMetaMask();
         } else {
-            showAlert('Deja conectat la MetaMask!', 'info');
+            showAlert('Already connected to MetaMask!', 'info');
         }
     });
     
-    // Acțiuni token
     document.getElementById('add-to-metamask-btn').addEventListener('click', addToMetaMask);
     document.getElementById('transfer-btn').addEventListener('click', () => openModal('transfer-modal'));
     document.getElementById('approve-btn').addEventListener('click', () => openModal('approve-modal'));
     document.getElementById('refresh-balance-btn').addEventListener('click', refreshBalance);
     
-    // Închide modale
     document.getElementById('close-transfer-modal').addEventListener('click', () => closeModal('transfer-modal'));
     document.getElementById('close-approve-modal').addEventListener('click', () => closeModal('approve-modal'));
     
-    // Confirmări
     document.getElementById('confirm-transfer-btn').addEventListener('click', confirmTransfer);
     document.getElementById('confirm-approve-btn').addEventListener('click', confirmApprove);
     
-    // Închide modal la click în afară
     window.addEventListener('click', (e) => {
         if (e.target.classList.contains('modal')) {
             e.target.classList.remove('show');
@@ -439,17 +390,16 @@ function setupEventListeners() {
     });
 }
 
-// Încarcă informații despre token
 async function loadToken() {
     const contractAddress = document.getElementById('contract-address').value.trim();
     
     if (!contractAddress) {
-        showAlert('Introdu o adresă de contract!', 'error');
+            showAlert('Enter a contract address!', 'error');
         return;
     }
     
     if (!web3) {
-        showAlert('Web3 nu este inițializat!', 'error');
+        showAlert('Web3 is not initialized!', 'error');
         return;
     }
     
@@ -459,19 +409,15 @@ async function loadToken() {
     }
     
     try {
-        // Creează instanța contractului
         const tokenContract = new web3.eth.Contract(ERC20_ABI, contractAddress);
         
-        // Obține informații despre token
         const name = await tokenContract.methods.name().call();
         const symbol = await tokenContract.methods.symbol().call();
         const decimals = await tokenContract.methods.decimals().call();
         const balance = await tokenContract.methods.balanceOf(userAccount).call();
         
-        // Calculează balanța formatată
         const formattedBalance = (balance / Math.pow(10, decimals)).toFixed(4);
         
-        // Salvează token-ul curent
         currentToken = {
             address: contractAddress,
             name: name,
@@ -481,7 +427,6 @@ async function loadToken() {
             contract: tokenContract
         };
         
-        // Afișează informațiile
         document.getElementById('token-name').textContent = name;
         document.getElementById('token-symbol').textContent = symbol;
         document.getElementById('token-decimals').textContent = decimals;
@@ -489,20 +434,18 @@ async function loadToken() {
         document.getElementById('token-contract').textContent = `${contractAddress.substring(0, 6)}...${contractAddress.substring(38)}`;
         document.getElementById('available-balance').textContent = `${formattedBalance} ${symbol}`;
         
-        // Arată secțiunea cu detalii
         document.getElementById('token-details-section').style.display = 'block';
         
-        showAlert(`Token încărcat cu succes: ${name}`, 'success');
+        showAlert(`Token loaded successfully: ${name}`, 'success');
     } catch (error) {
-        console.error('Eroare la încărcarea tokenului:', error);
-        showAlert('Eroare la încărcarea tokenului. Verifică adresa contractului.', 'error');
+        console.error('Error at loading token:', error);
+        showAlert('Error at loading token. Check the contract address.', 'error');
     }
 }
 
-// Adaugă token în MetaMask
 async function addToMetaMask() {
     if (!currentToken) {
-        showAlert('Încarcă mai întâi un token!', 'error');
+        showAlert('Load a token first!', 'error');
         return;
     }
     
@@ -520,18 +463,17 @@ async function addToMetaMask() {
         });
         
         if (wasAdded) {
-            showAlert('Token adăugat în MetaMask!', 'success');
+            showAlert('Token added to MetaMask!', 'success');
         }
     } catch (error) {
-        console.error('Eroare la adăugarea în MetaMask:', error);
-        showAlert('Eroare la adăugarea în MetaMask', 'error');
+        console.error('Error at adding to MetaMask:', error);
+        showAlert('Error at adding to MetaMask', 'error');
     }
 }
 
-// Reîmprospătează balanța
 async function refreshBalance() {
     if (!currentToken || !userAccount) {
-        showAlert('Încarcă mai întâi un token!', 'error');
+        showAlert('Load a token first!', 'error');
         return;
     }
     
@@ -543,17 +485,16 @@ async function refreshBalance() {
         document.getElementById('token-balance').textContent = `${formattedBalance} ${currentToken.symbol}`;
         document.getElementById('available-balance').textContent = `${formattedBalance} ${currentToken.symbol}`;
         
-        showAlert('Balanță actualizată!', 'success');
+            showAlert('Balance updated!', 'success');
     } catch (error) {
-        console.error('Eroare la actualizarea balanței:', error);
-        showAlert('Eroare la actualizarea balanței', 'error');
+        console.error('Error at updating balance:', error);
+        showAlert('Error at updating balance', 'error');
     }
 }
 
-// Confirmă transfer
 async function confirmTransfer() {
     if (!currentToken || !userAccount) {
-        showAlert('Încarcă mai întâi un token!', 'error');
+        showAlert('Load a token first!', 'error');
         return;
     }
     
@@ -561,38 +502,33 @@ async function confirmTransfer() {
     const amount = document.getElementById('transfer-amount').value;
     
     if (!recipient || !amount) {
-        showAlert('Completează toate câmpurile!', 'error');
+        showAlert('Complete all fields!', 'error');
         return;
     }
     
     try {
-        // Convertește suma la unități
         const amountInUnits = Math.floor(parseFloat(amount) * Math.pow(10, currentToken.decimals));
         
-        // Trimite tranzacția
         const tx = await currentToken.contract.methods.transfer(recipient, amountInUnits.toString()).send({
             from: userAccount
         });
         
-        showAlert('Transfer realizat cu succes!', 'success');
+        showAlert('Transfer successful!', 'success');
         closeModal('transfer-modal');
         
-        // Actualizează balanța
         await refreshBalance();
         
-        // Reset form
         document.getElementById('recipient-address').value = '';
         document.getElementById('transfer-amount').value = '';
     } catch (error) {
-        console.error('Eroare la transfer:', error);
-        showAlert('Eroare la transfer. Verifică balanța și adresa.', 'error');
+        console.error('Error at transfer:', error);
+        showAlert('Error at transfer. Check the balance and address.', 'error');
     }
 }
 
-// Confirmă approve
 async function confirmApprove() {
     if (!currentToken || !userAccount) {
-        showAlert('Încarcă mai întâi un token!', 'error');
+        showAlert('Load a token first!', 'error');
         return;
     }
     
@@ -600,37 +536,33 @@ async function confirmApprove() {
     const amount = document.getElementById('approve-amount').value;
     
     if (!spender) {
-        showAlert('Introdu adresa spender!', 'error');
+        showAlert('Enter the spender address!', 'error');
         return;
     }
     
     try {
         let amountInUnits;
         if (!amount || amount === '') {
-            // Approve unlimited (max uint256)
             amountInUnits = '115792089237316195423570985008687907853269984665640564039457584007913129639935';
         } else {
             amountInUnits = Math.floor(parseFloat(amount) * Math.pow(10, currentToken.decimals)).toString();
         }
         
-        // Trimite tranzacția
         const tx = await currentToken.contract.methods.approve(spender, amountInUnits).send({
             from: userAccount
         });
         
-        showAlert('Approve realizat cu succes!', 'success');
+                showAlert('Approve successful!', 'success');
         closeModal('approve-modal');
         
-        // Reset form
         document.getElementById('spender-address').value = '';
         document.getElementById('approve-amount').value = '';
     } catch (error) {
-        console.error('Eroare la approve:', error);
-        showAlert('Eroare la approve', 'error');
+        console.error('Error at approve:', error);
+        showAlert('Error at approve', 'error');
     }
 }
 
-// Helpers pentru modale
 function openModal(modalId) {
     document.getElementById(modalId).classList.add('show');
 }
@@ -639,7 +571,6 @@ function closeModal(modalId) {
     document.getElementById(modalId).classList.remove('show');
 }
 
-// Alert personalizat
 function showAlert(message, type = 'info') {
     const alertDiv = document.createElement('div');
     alertDiv.className = `custom-alert alert-${type}`;
@@ -658,8 +589,7 @@ function showAlert(message, type = 'info') {
         ${type === 'error' ? 'background-color: #ef4444; color: white;' : ''}
         ${type === 'info' ? 'background-color: #3b82f6; color: white;' : ''}
     `;
-    
-    // Adaugă animație CSS dacă nu există
+        
     if (!document.getElementById('alert-style')) {
         const style = document.createElement('style');
         style.id = 'alert-style';

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Știri Crypto - Orionix</title>
+    <title>News</title>
     <link rel="stylesheet" href="../../style.css">
     <link rel="stylesheet" href="../../navbar/navbar.css">
     <link rel="stylesheet" href="news.css">
@@ -13,30 +13,29 @@
     
     <main class="news-page">
         <div class="news-header">
-            <h1>Știri Crypto</h1>
-            <p class="news-subtitle">Cele mai recente știri din lumea criptomonedelor</p>
+            <h1>News</h1>
+            <p class="news-subtitle">The latest news from the world of cryptocurrencies</p>
         </div>
 
         <div class="news-filters">
-            <button class="filter-btn active" data-category="ALL">Toate</button>
+            <button class="filter-btn active" data-category="ALL">All</button>
             <button class="filter-btn" data-category="BTC">Bitcoin</button>
             <button class="filter-btn" data-category="ETH">Ethereum</button>
             <button class="filter-btn" data-category="BLOCKCHAIN">Blockchain</button>
-            <button class="filter-btn" data-category="MARKET">Piață</button>
+            <button class="filter-btn" data-category="MARKET">Market</button>
         </div>
 
         <div id="loading-news" class="loading-container">
             <div class="spinner"></div>
-            <p>Se încarcă știrile...</p>
+            <p>Loading news...</p>
         </div>
 
         <div id="news-container" class="news-grid">
-            <!-- Știrile vor fi încărcate dinamic aici -->
         </div>
 
         <div id="error-message" class="error-message" style="display: none;">
-            <p>Nu s-au putut încărca știrile. Verifică conexiunea și încearcă din nou.</p>
-            <button onclick="location.reload()" class="retry-btn">Reîncarcă</button>
+            <p>Could not load news. Check your connection and try again.</p>
+            <button onclick="location.reload()" class="retry-btn">Reload</button>
         </div>
     </main>
 

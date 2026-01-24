@@ -128,8 +128,8 @@ app.get('/api/coin-info', async (req, res) => {
 
             if (!response.ok) {
                 const errorBody = await response.text();
-                console.error(`Gemini API call failed (Attempt ${attempt + 1}): ${response.status}. Body snippet: ${errorBody.substring(0, 100)}...`);
-                throw new Error(`Gemini API returned status ${response.status}`);
+                console.error(` ${attempt + 1}: ${response.status}: ${errorBody.substring(0, 100)}...`);
+                throw new Error(` ${response.status}`);
             }
 
             const result = await response.json();
@@ -141,11 +141,11 @@ app.get('/api/coin-info', async (req, res) => {
                 throw new Error("The model response does not contain text.");
             }
         } catch (error) {
-            console.warn(`Error at attempt ${attempt + 1} of AI generation (${coinName}):`, error.message);
+            console.warn(` ${attempt + 1}  (${coinName}):`, error.message);
             
             if (attempt === MAX_RETRIES - 1) {                                                  
-                console.error(`Permanent failure at obtaining information for ${coinName}.`);
-                return res.json({ description: `Sorry, we couldn't get information from AI about ${coinName}. Please try again later.` });
+                console.error(` ${coinName}.`);
+                return res.json({ description: ` ${coinName}.` });
             }
             const delay = Math.pow(2, attempt) * 1000;
             await new Promise(resolve => setTimeout(resolve, delay));
@@ -155,5 +155,5 @@ app.get('/api/coin-info', async (req, res) => {
 
 
 app.listen(PORT, () => {
-    console.log(`🚀 Proxy server (CryptoCompare) running on http://localhost:${PORT}`);
+    console.log(`Proxy server (CryptoCompare) running on http://localhost:${PORT}`);
 });

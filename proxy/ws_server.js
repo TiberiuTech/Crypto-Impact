@@ -17,7 +17,7 @@ async function initializeLivePrices() {
         const data = await response.json();
         
         if (!data || !data.Data || data.Data.length === 0) {
-            console.error('Error: No data received from /api/market. Using fallback data.');
+            console.error('No data received from /api/market. Using fallback coins (BTC, ETH, XRP, BNB, SOL).');
             const fallbackCoins = ['BTC', 'ETH', 'XRP', 'BNB', 'SOL'];
             fallbackCoins.forEach(symbol => {
                  livePrices[symbol] = { price: 1, change24h: 0, volume: 1 };
@@ -43,7 +43,7 @@ async function initializeLivePrices() {
 
     } catch (error) {
         console.error('Error at initializing live prices:', error.message);
-        console.error('Please check if the HTTP server (server.js) is running correctly on port 3000.');
+        console.error('Check if the HTTP server (server.js) is running correctly on port 3000.');
     }
 }
 
@@ -110,5 +110,5 @@ wss.on('connection', function connection(ws) {
     });
 });
 
-console.log(`🚀 WebSocket server running on ws://localhost:${WS_PORT}`);
-console.log('IMPORTANT: Run the HTTP server (server.js) separately on port 3000.');
+console.log(`WebSocket server running on ws://localhost:${WS_PORT}`);
+console.log('Run the HTTP server (server.js) separately on port 3000.');

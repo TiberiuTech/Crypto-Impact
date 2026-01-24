@@ -1,7 +1,6 @@
 import { formatPrice, formatLargeNumber } from '../../utils/formatters.js'; 
 import { allMarketData } from '../../client.js'; 
 
-// Funcție pentru a obține cheile de stocare bazate pe UID-ul utilizatorului
 function getStorageKeys() {
     const userData = localStorage.getItem('user');
     let userId = 'anonymous';
@@ -11,7 +10,7 @@ function getStorageKeys() {
             const user = JSON.parse(userData);
             userId = user.uid || 'anonymous';
         } catch (error) {
-            console.error('Eroare la parsarea datelor utilizatorului:', error);
+            console.error('Error parsing user data:', error);
         }
     }
     
@@ -22,38 +21,32 @@ function getStorageKeys() {
     };
 }
 
-// Soldul simulat inițial
 const INITIAL_BALANCE = 123456.78; 
 let currentBalance = INITIAL_BALANCE;
-let userAssets = []; // Array cu assets-urile utilizatorului
-let transactions = []; // Array cu tranzacțiile utilizatorului
+let userAssets = [];
+let transactions = [];
 let isModalOpen = false;
-const MARKET_URL = 'http://localhost:3000/api/market'; // URL-ul API-ului de piață
+const MARKET_URL = 'http://localhost:3000/api/market';
 
-// Așteaptă ca DOM-ul să fie complet încărcat
 document.addEventListener("DOMContentLoaded", () => {
-    // Reîncărcăm datele când utilizatorul se schimbă
     loadInitialData();
     loadUserAssets();
     loadTransactions();
     setupButtonListeners();
-    setupDepositModalListeners(); // Inițializează ascultătorii pentru modal
-    setupAddFundsModal(); // Inițializează modalul de adăugare fonduri
-    setupWithdrawModal(); // Inițializează modalul de retragere
-    setupSwapModal(); // Inițializează modalul de swap
+    setupDepositModalListeners();
+    setupAddFundsModal();
+    setupWithdrawModal();
+    setupSwapModal();
 });
 
-// Ascultăm pentru schimbări în localStorage (când utilizatorul se loghează/înregistrează)
 window.addEventListener('storage', function(e) {
     if (e.key === 'user') {
-        // Utilizatorul s-a schimbat - reîncărcăm datele
         loadInitialData();
         loadUserAssets();
         loadTransactions();
     }
 });
 
-// De asemenea, verificăm la fiecare încărcare a paginii dacă utilizatorul s-a schimbat
 let lastUserId = null;
 function checkUserChange() {
     const userData = localStorage.getItem('user');
@@ -64,12 +57,10 @@ function checkUserChange() {
             const user = JSON.parse(userData);
             currentUserId = user.uid || 'anonymous';
         } catch (error) {
-            // Ignorăm eroarea
         }
     }
     
     if (lastUserId !== null && lastUserId !== currentUserId) {
-        // Utilizatorul s-a schimbat - reîncărcăm datele
         loadInitialData();
         loadUserAssets();
         loadTransactions();
@@ -78,64 +69,49 @@ function checkUserChange() {
     lastUserId = currentUserId;
 }
 
-// Verificăm la încărcarea paginii
 checkUserChange();
 
-// Verificăm periodic (în cazul în care utilizatorul se schimbă în același tab)
 setInterval(checkUserChange, 1000);
 
 
-/**
- * Funcție de suport: forțează încărcarea datelor de piață dacă acestea lipsesc,
- * asigurând că dropdown-ul poate fi populat indiferent de pagina vizitată anterior.
- */
 async function ensureMarketDataLoaded() {
     if (allMarketData.length > 0) {
         return true;
     }
     
-    // Nu mai afișăm alerta "se încarcă", ci lăsăm utilizatorul să aștepte.
-
     try {
         const response = await fetch(MARKET_URL);
         
         if (!response.ok) {
-            throw new Error('Eroare la serverul proxy (verifică portul 3000).');
+            throw new Error('Error loading market data (check port 3000).');
         }
         
         const data = await response.json();
         const coins = data.Data;
         
         if (!Array.isArray(coins) || coins.length === 0) {
-            throw new Error("Date de piață goale.");
+            throw new Error("Empty market data.");
         }
         
-        // Filtrare și populare
         const filteredCoins = coins.filter(coin => coin.RAW && coin.RAW.EUR);
 
-        // ATENȚIE: Returnăm datele filtrate local.
         return filteredCoins;
 
     } catch (error) {
-        console.error("Eroare la încărcarea forțată a datelor de piață:", error);
-        showCustomAlert(`Eroare: ${error.message}.`);
+        console.error("Error loading market data:", error);
+        showCustomAlert(`Error: ${error.message}.`);
         return false;
     }
 }
 
 
-/**
- * Încarcă soldul din localStorage sau folosește valoarea inițială.
- */
 function loadInitialData() {
     const storageKeys = getStorageKeys();
-    // Încercăm să preluăm soldul stocat pentru utilizatorul curent
     const storedBalance = localStorage.getItem(storageKeys.balance);
     
     if (storedBalance !== null) {
         currentBalance = parseFloat(storedBalance);
     } else {
-        // Dacă nu există, setăm soldul inițial pentru noul utilizator
         localStorage.setItem(storageKeys.balance, INITIAL_BALANCE);
         currentBalance = INITIAL_BALANCE;
     }
@@ -143,9 +119,6 @@ function loadInitialData() {
     updateUI(currentBalance);
 }
 
-/**
- * Încarcă assets-urile utilizatorului din localStorage.
- */
 function loadUserAssets() {
     const storageKeys = getStorageKeys();
     const storedAssets = localStorage.getItem(storageKeys.assets);
@@ -155,7 +128,7 @@ function loadUserAssets() {
             userAssets = JSON.parse(storedAssets);
             renderAssets();
         } catch (error) {
-            console.error('Eroare la încărcarea assets-urilor:', error);
+            console.error('Error loading assets:', error);
             userAssets = [];
         }
     } else {
@@ -163,17 +136,12 @@ function loadUserAssets() {
     }
 }
 
-/**
- * Salvează assets-urile în localStorage.
- */
 function saveUserAssets() {
     const storageKeys = getStorageKeys();
     localStorage.setItem(storageKeys.assets, JSON.stringify(userAssets));
 }
 
-/**
- * Încarcă tranzacțiile din localStorage.
- */
+
 async function loadTransactions() {
     const storageKeys = getStorageKeys();
     const storedTransactions = localStorage.getItem(storageKeys.transactions);
@@ -183,7 +151,7 @@ async function loadTransactions() {
             transactions = JSON.parse(storedTransactions);
             await renderTransactions();
         } catch (error) {
-            console.error('Eroare la încărcarea tranzacțiilor:', error);
+            console.error('Error loading transactions:', error);
             transactions = [];
         }
     } else {
@@ -191,28 +159,21 @@ async function loadTransactions() {
     }
 }
 
-/**
- * Salvează tranzacțiile în localStorage.
- */
 function saveTransactions() {
     const storageKeys = getStorageKeys();
     localStorage.setItem(storageKeys.transactions, JSON.stringify(transactions));
 }
 
-/**
- * Adaugă o tranzacție nouă.
- */
 async function addTransaction(type, details) {
     const transaction = {
         id: Date.now(),
-        type: type, // 'deposit', 'add_funds', 'withdraw', 'swap'
+        type: type,
         date: new Date().toISOString(),
         details: details
     };
     
-    transactions.unshift(transaction); // Adăugăm la început
+    transactions.unshift(transaction);
     
-    // Păstrăm doar ultimele 50 de tranzacții
     if (transactions.length > 50) {
         transactions = transactions.slice(0, 50);
     }
@@ -221,19 +182,15 @@ async function addTransaction(type, details) {
     await renderTransactions();
 }
 
-/**
- * Renderizează tranzacțiile în UI.
- */
 async function renderTransactions() {
     const transactionsContainer = document.getElementById('transactions-container');
     if (!transactionsContainer) return;
     
     if (transactions.length === 0) {
-        transactionsContainer.innerHTML = '<p style="color: #8B949E; text-align: center; padding: 20px;">Aici vor apărea tranzacțiile tale viitoare.</p>';
+        transactionsContainer.innerHTML = '<p style="color: #8B949E; text-align: center; padding: 20px;">Here will appear your future transactions.</p>';
         return;
     }
-    
-    // Asigurăm că datele de piață sunt încărcate
+
     if (!allMarketData || allMarketData.length === 0) {
         await ensureMarketDataLoaded();
     }
@@ -245,7 +202,7 @@ async function renderTransactions() {
         transactionCard.className = 'transaction-card';
         
         const date = new Date(transaction.date);
-        const formattedDate = date.toLocaleDateString('ro-RO', {
+        const formattedDate = date.toLocaleDateString('en-US', {
             day: '2-digit',
             month: '2-digit',
             year: 'numeric',
@@ -263,37 +220,32 @@ async function renderTransactions() {
                 typeLabel = 'Depozit';
                 typeClass = 'transaction-type-deposit';
                 description = `${transaction.details.quantity} ${transaction.details.symbol}`;
-                amount = `-€${formatPrice(transaction.details.value)}`; // Scade din balanță
+                amount = `-€${formatPrice(transaction.details.value)}`;
                 break;
             case 'add_funds':
-                typeLabel = 'Adăugare Fonduri';
+                typeLabel = 'Add Funds';
                 typeClass = 'transaction-type-add-funds';
-                description = 'Adăugare fonduri prin card';
-                amount = `+€${formatPrice(transaction.details.amount)}`; // Crește balanța
+                description = 'Add funds by card';
+                amount = `+€${formatPrice(transaction.details.amount)}`;
                 break;
             case 'withdraw':
-                typeLabel = 'Retragere';
+                typeLabel = 'Withdraw';
                 typeClass = 'transaction-type-withdraw';
                 description = `${transaction.details.quantity} ${transaction.details.symbol}`;
-                amount = `+€${formatPrice(transaction.details.value)}`; // Crește balanța
+                amount = `+€${formatPrice(transaction.details.value)}`;
                 break;
             case 'swap':
                 typeLabel = 'Swap';
                 typeClass = 'transaction-type-swap';
-                // Formatăm cantitățile pentru a fi mai ușor de citit
                 const fromQty = parseFloat(transaction.details.fromQuantity);
                 const toQty = parseFloat(transaction.details.toQuantity);
                 
-                // Funcție helper pentru formatare cantități
                 const formatQuantity = (qty) => {
                     if (qty >= 1) {
-                        // Pentru numere >= 1, afișăm maxim 6 zecimale
                         return qty.toFixed(6).replace(/\.?0+$/, '');
                     } else if (qty >= 0.000001) {
-                        // Pentru numere între 0.000001 și 1, afișăm maxim 8 zecimale
                         return qty.toFixed(8).replace(/\.?0+$/, '');
                     } else {
-                        // Pentru numere foarte mici, folosim notare științifică sau limităm zecimalele
                         return qty.toExponential(3).replace(/\.?0+e/, 'e');
                     }
                 };
@@ -321,8 +273,7 @@ async function renderTransactions() {
 }
 
 /**
- * Calculează valoarea totală a portofelului (suma valorilor tuturor assets-urilor).
- * @returns {number} Valoarea totală a portofelului în EUR.
+ * @returns {number}
  */
 function calculateWalletTotalValue() {
     if (!userAssets || userAssets.length === 0) {
@@ -339,15 +290,13 @@ function calculateWalletTotalValue() {
 }
 
 /**
- * Actualizează elementele UI cu soldul curent și valoarea portofelului.
- * @param {number} balance - Soldul de afișat.
+ * @param {number} balance 
  */
 function updateUI(balance) {
     const balanceElement = document.querySelector('.balance-value');
     const walletTotalValueElement = document.querySelector('.wallet-total-value');
     const greetingNameElement = document.getElementById('greeting-name');
     
-    // Folosim formatarea localizată în USD pentru balanță
     const formattedBalance = balance.toLocaleString('en-US', {
         style: 'currency',
         currency: 'USD',
@@ -359,7 +308,6 @@ function updateUI(balance) {
         balanceElement.textContent = formattedBalance;
     }
     
-    // Calculăm și afișăm valoarea totală a portofelului
     const walletTotalValue = calculateWalletTotalValue();
     const formattedWalletValue = walletTotalValue.toLocaleString('en-US', {
         style: 'currency',
@@ -372,7 +320,6 @@ function updateUI(balance) {
         walletTotalValueElement.textContent = formattedWalletValue;
     }
     
-    // Actualizăm numele utilizatorului
     if (greetingNameElement) {
         const userData = localStorage.getItem('user');
         if (userData) {
@@ -389,75 +336,60 @@ function updateUI(balance) {
     }
 }
 
-/**
- * Setează ascultătorii de evenimente pentru butoane.
- */
+
 function setupButtonListeners() {
-    // Deschide modalul de depozit la click pe butonul de depozit
     document.querySelector('.action-column-group .main-actions .primary').addEventListener('click', () => {
         openDepositModal();
     });
     
-    // Deschide modalul de adăugare fonduri
     document.querySelector('.action-column-group .secondary-actions .primary').addEventListener('click', () => {
         openAddFundsModal();
     });
     
-    // Buton Retragere (secundar)
     document.querySelector('.action-column-group .main-actions .secondary').addEventListener('click', () => {
         openWithdrawModal();
     });
     
-    // Buton Swap (Schimbă)
     document.querySelector('.action-column-group .secondary-actions .secondary').addEventListener('click', () => {
         openSwapModal();
     });
 }
 
 /**
- * Gestionează tranzacțiile simulate (Retragere).
- * @param {string} type - 'Withdraw'.
+ * @param {string} type 
  */
 function handleTransaction(type) {
-    // Doar logica de Retragere rămâne aici.
     if (type !== 'Withdraw') return;
 
-    const amount = 50.00; // Sumă fixă pentru simulare
+    const amount = 50.00;
     
     if (currentBalance < amount) {
-        showCustomAlert('Eroare: Fonduri insuficiente pentru această retragere simulată.');
+        showCustomAlert('Error: Insufficient funds for this simulated withdrawal.');
         return;
     }
     
-    // Simulăm tranzacția
     currentBalance -= amount;
     currentBalance = parseFloat(currentBalance.toFixed(2));
 
-    // Salvăm noul sold și actualizăm UI
     const storageKeys = getStorageKeys();
     localStorage.setItem(storageKeys.balance, currentBalance);
     updateUI(currentBalance);
-    showCustomAlert(`Tranzacție reușită! Ai retras $${amount.toFixed(2)}. Noul sold este afișat.`);
+    showCustomAlert(`Transaction successful! You have withdrawn $${amount.toFixed(2)}. The new balance is displayed.`);
 }
 
-
-// =========================================================================
-// LOGICA MODALULUI DE DEPOZIT 
-// =========================================================================
 
 function setupDepositModalListeners() {
     const modal = document.getElementById("depositModal");
     
-    // Verifică dacă modalul există înainte de a continua
     if (!modal) {
-        console.warn("Modalul de depozit (#depositModal) nu a fost găsit. Ascultătorii nu au fost inițializați.");
+        console.warn("Deposit modal (#depositModal) not found. Event listeners not initialized.");
         return; 
     }
     
     const closeBtn = modal.querySelector(".close-button");
     
     if (!closeBtn) {
-        console.error("Butonul de închidere al modalului lipsește.");
+        console.error("Close button for the modal is missing.");
         return;
     }
 
@@ -468,21 +400,17 @@ function setupDepositModalListeners() {
         }
     };
     
-    // Ascultători pentru schimbarea monedei și a cantității
     setupCustomDropdown();
     document.getElementById('deposit-quantity').addEventListener('input', calculateDepositValue);
     
-    // Ascultător pentru butonul de Confirmare
     document.getElementById('confirm-deposit-btn').addEventListener('click', handleDepositConfirm);
 }
 
 function closeDepositModal() {
     document.getElementById("depositModal").style.display = "none";
     isModalOpen = false;
-    // Resetăm formularul
     document.getElementById('deposit-quantity').value = '';
     document.getElementById('deposit-value').textContent = '€0.00';
-    // Resetăm dropdown-ul custom
     const dropdownWrapper = document.getElementById('deposit-symbol-wrapper');
     const dropdownSelected = document.getElementById('deposit-symbol-selected');
     const hiddenSelect = document.getElementById('deposit-symbol');
@@ -507,26 +435,22 @@ function closeDepositModal() {
         hiddenSelect.selectedIndex = 0; 
     }
     
-    // Ascundem secțiunea de detalii
     if (coinDetailsSection) {
         coinDetailsSection.style.display = 'none';
     }
     
-    // Resetăm prețul curent afișat
     const currentPriceElement = document.getElementById('current-coin-price');
     if (currentPriceElement) {
-        currentPriceElement.textContent = '1 Monedă = €0.00';
+        currentPriceElement.textContent = '1 Coin = €0.00';
     }
 }
 
 async function openDepositModal() {
-    // Încercăm să încărcăm datele dacă lipsesc
     const loadedData = await ensureMarketDataLoaded();
     
     let coinsToUse = allMarketData;
 
     if (loadedData && Array.isArray(loadedData)) {
-        // Dacă ensureMarketDataLoaded a returnat date noi, le folosim
         coinsToUse = loadedData;
     }
     
@@ -534,53 +458,47 @@ async function openDepositModal() {
     document.getElementById("depositModal").style.display = "flex";
     isModalOpen = true;
     
-    // Afișăm o avertizare doar dacă încărcarea forțată a eșuat și lista este goală.
     if (!coinsToUse || coinsToUse.length === 0) {
-        showCustomAlert('Eroare: Nu s-au putut obține date de preț. Verificați serverul proxy.');
+        showCustomAlert('Error: Unable to get price data. Please check the proxy server.');
     }
     
-    calculateDepositValue(); // Calculează valoarea inițială
+    calculateDepositValue();
 }
 
 /**
- * Populează dropdown-ul cu monedele din lista principală.
- * @param {Array<object>} coins - Lista de monede de utilizat.
+ * @param {Array<object>} coins 
  */
 function populateCoinDropdown(coins) {
     const hiddenSelect = document.getElementById('deposit-symbol');
     const optionsContainer = document.getElementById('deposit-symbol-options');
     const selectedDisplay = document.getElementById('deposit-symbol-selected');
     
-    // Curățăm listele existente
     hiddenSelect.innerHTML = '';
     if (optionsContainer) {
         optionsContainer.innerHTML = '';
     }
 
-    // Adăugăm o opțiune implicită în select-ul hidden
     const defaultOption = document.createElement('option');
     defaultOption.value = '';
-    defaultOption.textContent = coins && coins.length > 0 ? 'Selectează o monedă...' : 'Nu sunt disponibile monede';
+    defaultOption.textContent = coins && coins.length > 0 ? 'Select a coin...' : 'No coins available';
     defaultOption.disabled = true;
     defaultOption.selected = true;
     hiddenSelect.appendChild(defaultOption);
 
-    // Resetăm afișajul selectat
     if (selectedDisplay) {
         const dropdownText = selectedDisplay.querySelector('.dropdown-text');
         if (dropdownText) {
-            dropdownText.textContent = coins && coins.length > 0 ? 'Selectează o monedă...' : 'Nu sunt disponibile monede';
+            dropdownText.textContent = coins && coins.length > 0 ? 'Select a coin...' : 'No coins available';
         }
     }
 
-    // Adăugăm monedele din lista furnizată
     if (coins && coins.length > 0 && optionsContainer) {
         coins.forEach(coin => {
             const symbol = coin.CoinInfo.Name;
             const fullName = coin.CoinInfo.FullName;
             const rawData = coin.RAW && coin.RAW.EUR ? coin.RAW.EUR : null;
             
-            if (!rawData) return; // Sărim monedele fără date
+            if (!rawData) return;
             
             const price = rawData.PRICE || 0;
             const change24h = rawData.CHANGEPCT24HOUR || 0;
@@ -590,7 +508,6 @@ function populateCoinDropdown(coins) {
             const low24h = rawData.LOW24HOUR || 0;
             const iconUrl = `https://www.cryptocompare.com${coin.CoinInfo.ImageUrl}`;
             
-            // Creăm opțiunea pentru select-ul hidden cu toate datele
             const hiddenOption = document.createElement('option');
             hiddenOption.value = symbol;
             hiddenOption.textContent = `${symbol} - ${fullName}`;
@@ -604,7 +521,6 @@ function populateCoinDropdown(coins) {
             hiddenOption.setAttribute('data-fullname', fullName);
             hiddenSelect.appendChild(hiddenOption);
             
-            // Creăm opțiunea pentru dropdown-ul custom cu iconiță și detalii
             const customOption = document.createElement('div');
             customOption.className = 'custom-dropdown-option';
             customOption.setAttribute('data-value', symbol);
@@ -632,7 +548,6 @@ function populateCoinDropdown(coins) {
                 </div>
             `;
             
-            // Adăugăm event listener pentru selecție
             customOption.addEventListener('click', () => {
                 selectCoinOption(coin);
             });
@@ -643,7 +558,6 @@ function populateCoinDropdown(coins) {
 }
 
 /**
- * Gestionează selecția unei monede din dropdown-ul custom.
  */
 function selectCoinOption(coin) {
     const coinInfo = coin.CoinInfo;
@@ -667,25 +581,21 @@ function selectCoinOption(coin) {
     const iconPreviewDropdown = document.getElementById('coin-icon-preview-dropdown');
     const coinDetailsSection = document.getElementById('coin-details-section');
     
-    // Închidem dropdown-ul
     if (dropdownWrapper) {
         dropdownWrapper.classList.remove('active');
     }
     
-    // Actualizăm afișajul selectat din dropdown
     if (selectedDisplay) {
         const dropdownText = selectedDisplay.querySelector('.dropdown-selected-text');
         if (dropdownText) {
             dropdownText.textContent = `${symbol} - ${fullName}`;
         }
         
-        // Actualizăm iconița din dropdown
         if (iconPreviewDropdown) {
             iconPreviewDropdown.innerHTML = `<img src="${iconUrl}" alt="${symbol} icon" onerror="this.src='https://placehold.co/32x32/161B22/FFFFFF?text=?'">`;
         }
     }
     
-    // Actualizăm select-ul hidden
     if (hiddenSelect) {
         const option = Array.from(hiddenSelect.options).find(opt => opt.value === symbol);
         if (option) {
@@ -693,27 +603,22 @@ function selectCoinOption(coin) {
         }
     }
     
-    // Afișăm și actualizăm secțiunea de detalii
     if (coinDetailsSection) {
         coinDetailsSection.style.display = 'block';
         
-        // Iconița mare
         const iconPreview = document.getElementById('coin-icon-preview');
         if (iconPreview) {
             iconPreview.innerHTML = `<img src="${iconUrl}" alt="${symbol} icon" onerror="this.src='https://placehold.co/48x48/161B22/FFFFFF?text=?'">`;
         }
         
-        // Numele și simbolul
         const coinNameDisplay = document.getElementById('coin-name-display');
         const coinSymbolDisplay = document.getElementById('coin-symbol-display');
         if (coinNameDisplay) coinNameDisplay.textContent = fullName;
         if (coinSymbolDisplay) coinSymbolDisplay.textContent = symbol;
         
-        // Prețul
         const coinPriceDisplay = document.getElementById('coin-price-display');
         if (coinPriceDisplay) coinPriceDisplay.textContent = `€${formatPrice(price)}`;
         
-        // Schimbarea 24h
         const coinChangeDisplay = document.getElementById('coin-change-display');
         if (coinChangeDisplay) {
             const changeClass = change24h >= 0 ? 'positive' : 'negative';
@@ -722,22 +627,18 @@ function selectCoinOption(coin) {
             coinChangeDisplay.className = `detail-value ${changeClass}`;
         }
         
-        // Volumul 24h
         const coinVolumeDisplay = document.getElementById('coin-volume-display');
         if (coinVolumeDisplay) coinVolumeDisplay.textContent = `€${formatLargeNumber(volume24h)}`;
         
-        // Market Cap
         const coinMarketcapDisplay = document.getElementById('coin-marketcap-display');
         if (coinMarketcapDisplay) coinMarketcapDisplay.textContent = `€${formatLargeNumber(marketCap)}`;
         
-        // High 24h
         const coinHighDisplay = document.getElementById('coin-high-display');
         if (coinHighDisplay) {
             coinHighDisplay.textContent = `€${formatPrice(high24h)}`;
             coinHighDisplay.className = 'detail-value positive';
         }
         
-        // Low 24h
         const coinLowDisplay = document.getElementById('coin-low-display');
         if (coinLowDisplay) {
             coinLowDisplay.textContent = `€${formatPrice(low24h)}`;
@@ -745,12 +646,10 @@ function selectCoinOption(coin) {
         }
     }
     
-    // Recalculăm valoarea
     calculateDepositValue();
 }
 
 /**
- * Configurează funcționalitatea dropdown-ului custom.
  */
 function setupCustomDropdown() {
     const dropdownWrapper = document.getElementById('deposit-symbol-wrapper');
@@ -760,13 +659,11 @@ function setupCustomDropdown() {
         return;
     }
     
-    // Toggle dropdown la click pe elementul selectat
     selectedDisplay.addEventListener('click', (e) => {
         e.stopPropagation();
         dropdownWrapper.classList.toggle('active');
     });
     
-    // Închidem dropdown-ul când se face click în afara lui
     document.addEventListener('click', (e) => {
         if (!dropdownWrapper.contains(e.target)) {
             dropdownWrapper.classList.remove('active');
@@ -775,7 +672,6 @@ function setupCustomDropdown() {
 }
 
 /**
- * Calculează valoarea depozitului pe baza cantității și a prețului curent.
  */
 function calculateDepositValue() {
     if (!isModalOpen) return;
@@ -785,11 +681,10 @@ function calculateDepositValue() {
     const valueDisplay = document.getElementById('deposit-value');
 
     const selectedOption = hiddenSelect ? hiddenSelect.options[hiddenSelect.selectedIndex] : null;
-    // Folosim o expresie regulată pentru a ne asigura că este un număr valid (eliminăm caracterele non-numerice)
     const quantity = parseFloat(quantityInput.value.replace(/[^0-9.]/g, '')) || 0;
     
     let price = 0;
-    let symbol = 'Monedă';
+    let symbol = 'Coin';
     
     if (selectedOption && selectedOption.value) {
         price = parseFloat(selectedOption.getAttribute('data-price'));
@@ -798,10 +693,8 @@ function calculateDepositValue() {
     
     const totalValue = quantity * price;
     
-    // Afișăm valoarea totală
     valueDisplay.textContent = `€${formatPrice(totalValue)}`;
     
-    // Afișăm prețul curent al monedei
     const currentPriceElement = document.getElementById('current-coin-price');
     if (currentPriceElement) {
         currentPriceElement.textContent = `1 ${symbol} = €${formatPrice(price)}`;
@@ -809,14 +702,12 @@ function calculateDepositValue() {
     }
 }
 
-/**
- * Gestionează confirmarea depozitului.
+/**     
  */
 function handleDepositConfirm() {
-    // Verificăm dacă sunt date în dropdown (dacă nu, înseamnă că au lipsit la încărcare)
     const hiddenSelect = document.getElementById('deposit-symbol');
-    if (!hiddenSelect || hiddenSelect.options.length <= 1) { // 1 = opțiunea implicită 'Selectează o monedă...'
-        showCustomAlert('Eroare: Nu s-au putut obține prețuri valide. Reîncercați.');
+    if (!hiddenSelect || hiddenSelect.options.length <= 1) {
+        showCustomAlert('Error: Unable to get valid prices. Please try again.');
         return;
     }
     
@@ -827,7 +718,7 @@ function handleDepositConfirm() {
     const quantity = parseFloat(quantityInput.value);
     
     if (!symbol || quantity <= 0) {
-        showCustomAlert('Eroare: Selectează o monedă și introdu o cantitate validă.');
+        showCustomAlert('Error: Select a coin and enter a valid quantity.');
         return;
     }
 
@@ -837,13 +728,11 @@ function handleDepositConfirm() {
     const fullName = selectedOption.getAttribute('data-fullname') || symbol;
     const totalDepositValue = quantity * price;
 
-    // Verificăm dacă utilizatorul are suficienți bani pentru a cumpăra monedele
     if (currentBalance < totalDepositValue) {
-        showCustomAlert(`Eroare: Fonduri insuficiente. Ai nevoie de €${formatPrice(totalDepositValue)}, dar ai doar €${formatPrice(currentBalance)}.`);
+        showCustomAlert(`Error: Insufficient funds. You need €${formatPrice(totalDepositValue)}, but you only have €${formatPrice(currentBalance)}.`);
         return;
     }
 
-    // Scădem din balanță când cumpărăm monede (depozit)
     currentBalance -= totalDepositValue;
     currentBalance = parseFloat(currentBalance.toFixed(2));
 
@@ -851,7 +740,6 @@ function handleDepositConfirm() {
     localStorage.setItem(storageKeys.balance, currentBalance);
     updateUI(currentBalance);
     
-    // Adăugăm sau actualizăm asset-ul
     addOrUpdateAsset({
         symbol: symbol,
         fullName: fullName,
@@ -862,7 +750,6 @@ function handleDepositConfirm() {
         iconUrl: iconUrl
     });
     
-    // Adăugăm tranzacția
     addTransaction('deposit', {
         symbol: symbol,
         quantity: quantity,
@@ -871,17 +758,15 @@ function handleDepositConfirm() {
     });
     
     closeDepositModal();
-    showCustomAlert(`Depozit reușit: ${quantity} ${symbol} (Valoare: €${formatPrice(totalDepositValue)}).`);
+    showCustomAlert(`Deposit successful: ${quantity} ${symbol} (Value: €${formatPrice(totalDepositValue)}).`);
 }
 
 /**
- * Adaugă sau actualizează un asset în portofel.
  */
 function addOrUpdateAsset(assetData) {
     const existingAssetIndex = userAssets.findIndex(asset => asset.symbol === assetData.symbol);
     
     if (existingAssetIndex >= 0) {
-        // Actualizăm asset-ul existent (adăugăm cantitatea)
         const existingAsset = userAssets[existingAssetIndex];
         const totalValue = (existingAsset.quantity * existingAsset.purchasePrice) + (assetData.quantity * assetData.purchasePrice);
         const totalQuantity = existingAsset.quantity + assetData.quantity;
@@ -895,7 +780,6 @@ function addOrUpdateAsset(assetData) {
             change24h: assetData.change24h
         };
     } else {
-        // Adăugăm un asset nou
         userAssets.push({
             symbol: assetData.symbol,
             fullName: assetData.fullName,
@@ -910,11 +794,10 @@ function addOrUpdateAsset(assetData) {
     
     saveUserAssets();
     renderAssets();
-    updateUI(currentBalance); // Actualizăm UI-ul pentru a reflecta noua valoare a portofelului
+    updateUI(currentBalance);
 }
 
 /**
- * Renderizează assets-urile în UI.
  */
 function renderAssets() {
     const assetsContainer = document.getElementById('assets-container');
@@ -922,7 +805,6 @@ function renderAssets() {
     
     if (userAssets.length === 0) {
         assetsContainer.innerHTML = '<div style="grid-column: 1 / -1; display: flex; align-items: center; justify-content: center; min-height: 300px; color: #8B949E; font-size: 16px; text-align: center;">Nu ai assets încă. Fă un depozit pentru a începe!</div>';
-        // Actualizează UI-ul pentru a reflecta valoarea 0 a portofelului
         updateUI(currentBalance);
         return;
     }
@@ -969,24 +851,20 @@ function renderAssets() {
         
         assetsContainer.appendChild(assetCard);
     });
-    
-    // IMPORTANT: Actualizează valoarea totală a portofelului după ce am afișat toate assets-urile
+
     updateUI(currentBalance);
 }
 
 
 /**
- * Funcție simplă de afișare a mesajelor (înlocuitor pentru alert()).
  * @param {string} message - Mesajul de afișat.
  */
 function showCustomAlert(message) {
     const statusDiv = document.createElement('div');
     statusDiv.className = 'temp-status-message';
-    // Stiluri pentru notificare pop-up (roșu/portocaliu pentru vizibilitate pe fundal întunecat)
     statusDiv.style.cssText = 'position: fixed; bottom: 20px; right: 20px; background: #FF5733; color: white; padding: 10px 20px; border-radius: 5px; z-index: 9999; font-weight: bold; animation: fadeout 3s forwards;';
     statusDiv.textContent = message;
     
-    // Adaugă chei CSS pentru animație (trebuie definite în style.css, dar le punem inline pentru simplitate)
     if (!document.getElementById('temp-alert-style')) {
          const style = document.createElement('style');
          style.id = 'temp-alert-style';
@@ -1007,15 +885,10 @@ function showCustomAlert(message) {
     }, 3000);
 }
 
-// =========================================================================
-// LOGICA MODALULUI ADĂUGĂ FONDURI
-// =========================================================================
-
 function openAddFundsModal() {
     const modal = document.getElementById('addFundsModal');
     if (modal) {
         modal.style.display = 'flex';
-        // Resetăm formularul
         document.getElementById('add-funds-form').reset();
     }
 }
@@ -1035,7 +908,6 @@ function setupAddFundsModal() {
     
     if (!modal || !closeBtn || !form) return;
     
-    // Închidere modal
     closeBtn.onclick = closeAddFundsModal;
     window.onclick = (event) => {
         if (event.target === modal) {
@@ -1043,7 +915,6 @@ function setupAddFundsModal() {
         }
     };
     
-    // Formatare număr card (spații la fiecare 4 cifre)
     const cardNumberInput = document.getElementById('card-number');
     if (cardNumberInput) {
         cardNumberInput.addEventListener('input', (e) => {
@@ -1053,7 +924,6 @@ function setupAddFundsModal() {
         });
     }
     
-    // Formatare data expirării (MM/YY)
     const expiryInput = document.getElementById('card-expiry');
     if (expiryInput) {
         expiryInput.addEventListener('input', (e) => {
@@ -1065,7 +935,6 @@ function setupAddFundsModal() {
         });
     }
     
-    // Formatare CVV (doar numere)
     const cvvInput = document.getElementById('card-cvv');
     if (cvvInput) {
         cvvInput.addEventListener('input', (e) => {
@@ -1073,7 +942,6 @@ function setupAddFundsModal() {
         });
     }
     
-    // Submit formular
     form.addEventListener('submit', (e) => {
         e.preventDefault();
         handleAddFundsSubmit();
@@ -1087,7 +955,6 @@ function handleAddFundsSubmit() {
     const cardExpiry = document.getElementById('card-expiry').value;
     const cardCvv = document.getElementById('card-cvv').value;
     
-    // Validare
     if (!amount || amount <= 0) {
         showCustomAlert('Eroare: Introdu o sumă validă.');
         return;
@@ -1108,10 +975,8 @@ function handleAddFundsSubmit() {
         return;
     }
     
-    // Închidem modalul de adăugare fonduri
     closeAddFundsModal();
     
-    // Deschidem modalul de verificare
     openVerifyModal(amount);
 }
 
@@ -1121,35 +986,29 @@ function openVerifyModal(amount, successMessage = null) {
     
     if (modal && message) {
         if (successMessage) {
-            // Pentru retragere - mesajul de succes este deja procesat
             message.textContent = `Procesăm retragerea de €${formatPrice(amount)}. Te rugăm să aștepți...`;
         } else {
-            // Pentru adăugare fonduri
             message.textContent = `Procesăm plata de €${formatPrice(amount)}. Te rugăm să aștepți...`;
         }
         
         modal.style.display = 'flex';
         
-        // Simulăm procesarea (3 secunde)
         setTimeout(() => {
             closeVerifyModal();
             if (successMessage) {
-                // Pentru retragere - afișăm mesajul de succes
                 showCustomAlert(successMessage);
             } else {
-                // Pentru adăugare fonduri - adăugăm fondurile la sold
                 currentBalance += amount;
                 currentBalance = parseFloat(currentBalance.toFixed(2));
                 const storageKeys = getStorageKeys();
                 localStorage.setItem(storageKeys.balance, currentBalance);
                 updateUI(currentBalance);
-                
-                // Adăugăm tranzacția
+
                 addTransaction('add_funds', {
                     amount: amount
                 });
                 
-                showCustomAlert(`Fonduri adăugate cu succes! Suma de €${formatPrice(amount)} a fost adăugată în contul tău.`);
+                showCustomAlert(`Funds added successfully! The amount of €${formatPrice(amount)} has been added to your account.`);
             }
         }, 3000);
     }
@@ -1161,10 +1020,6 @@ function closeVerifyModal() {
         modal.style.display = 'none';
     }
 }
-
-// =========================================================================
-// LOGICA MODALULUI RETRAGERE
-// =========================================================================
 
 function openWithdrawModal() {
     const modal = document.getElementById('withdrawModal');
@@ -1187,7 +1042,6 @@ function closeWithdrawModal() {
         modal.style.display = 'none';
     }
     
-    // Resetăm dropdown-ul
     if (dropdownWrapper) {
         dropdownWrapper.classList.remove('active');
     }
@@ -1196,20 +1050,18 @@ function closeWithdrawModal() {
         const dropdownText = selectedDisplay.querySelector('.dropdown-selected-text');
         const iconPreviewDropdown = document.getElementById('withdraw-icon-preview-dropdown');
         if (dropdownText) {
-            dropdownText.textContent = 'Selectează un asset...';
+            dropdownText.textContent = 'Select a coin...';
         }
         if (iconPreviewDropdown) {
             iconPreviewDropdown.innerHTML = '';
         }
     }
     
-    // Ascundem butonul "Folosește tot"
     const useMaxBtn = document.getElementById('use-max-withdraw');
     if (useMaxBtn) {
         useMaxBtn.style.display = 'none';
     }
     
-    // Resetăm câmpurile
     document.getElementById('withdraw-quantity').value = '';
     document.getElementById('withdraw-value').textContent = '€0.00';
     document.getElementById('withdraw-asset-info').textContent = '';
@@ -1233,13 +1085,11 @@ function setupWithdrawModal() {
         }
     });
 
-    // Toggle dropdown la click pe elementul selectat
     selectedDisplay.addEventListener('click', (e) => {
         e.stopPropagation();
         dropdownWrapper.classList.toggle('active');
     });
     
-    // Închidem dropdown-ul când se face click în afara lui
     document.addEventListener('click', (e) => {
         if (!dropdownWrapper.contains(e.target)) {
             dropdownWrapper.classList.remove('active');
@@ -1257,32 +1107,27 @@ function populateWithdrawDropdown() {
     
     if (!hiddenSelect || !optionsContainer || !selectedDisplay) return;
     
-    // Curățăm listele existente
     hiddenSelect.innerHTML = '';
     optionsContainer.innerHTML = '';
     
-    // Adăugăm o opțiune implicită în select-ul hidden
     const defaultOption = document.createElement('option');
     defaultOption.value = '';
-    defaultOption.textContent = userAssets.length > 0 ? 'Selectează un asset...' : 'Nu ai assets disponibile';
+    defaultOption.textContent = userAssets.length > 0 ? 'Select a coin...' : 'You have no assets available';
     defaultOption.disabled = true;
     defaultOption.selected = true;
     hiddenSelect.appendChild(defaultOption);
     
-    // Resetăm afișajul selectat
     const dropdownText = selectedDisplay.querySelector('.dropdown-selected-text');
     const iconPreview = document.getElementById('withdraw-icon-preview-dropdown');
     if (dropdownText) {
-        dropdownText.textContent = userAssets.length > 0 ? 'Selectează un asset...' : 'Nu ai assets disponibile';
+        dropdownText.textContent = userAssets.length > 0 ? 'Select a coin...' : 'You have no assets available';
     }
     if (iconPreview) {
         iconPreview.innerHTML = '';
     }
     
-    // Adăugăm assets-urile din lista utilizatorului
     if (userAssets.length > 0) {
         userAssets.forEach(asset => {
-            // Creăm opțiunea pentru select-ul hidden
             const hiddenOption = document.createElement('option');
             hiddenOption.value = asset.symbol;
             hiddenOption.textContent = `${asset.symbol} - ${asset.fullName}`;
@@ -1291,7 +1136,6 @@ function populateWithdrawDropdown() {
             hiddenOption.setAttribute('data-icon', asset.iconUrl);
             hiddenSelect.appendChild(hiddenOption);
             
-            // Creăm opțiunea pentru dropdown-ul custom cu iconiță
             const customOption = document.createElement('div');
             customOption.className = 'custom-dropdown-option';
             customOption.setAttribute('data-value', asset.symbol);
@@ -1313,7 +1157,6 @@ function populateWithdrawDropdown() {
                 </div>
             `;
             
-            // Adăugăm event listener pentru selecție
             customOption.addEventListener('click', () => {
                 selectWithdrawAsset(asset);
             });
@@ -1329,25 +1172,21 @@ function selectWithdrawAsset(asset) {
     const hiddenSelect = document.getElementById('withdraw-asset');
     const iconPreviewDropdown = document.getElementById('withdraw-icon-preview-dropdown');
     
-    // Închidem dropdown-ul
     if (dropdownWrapper) {
         dropdownWrapper.classList.remove('active');
     }
     
-    // Actualizăm afișajul selectat din dropdown
     if (selectedDisplay) {
         const dropdownText = selectedDisplay.querySelector('.dropdown-selected-text');
         if (dropdownText) {
             dropdownText.textContent = `${asset.symbol} - ${asset.fullName}`;
         }
         
-        // Actualizăm iconița din dropdown (mai mică)
         if (iconPreviewDropdown) {
             iconPreviewDropdown.innerHTML = `<img src="${asset.iconUrl}" alt="${asset.symbol} icon" onerror="this.src='https://placehold.co/20x20/161B22/FFFFFF?text=?'" style="width: 20px; height: 20px;">`;
         }
     }
     
-    // Actualizăm select-ul hidden
     if (hiddenSelect) {
         const option = Array.from(hiddenSelect.options).find(opt => opt.value === asset.symbol);
         if (option) {
@@ -1355,7 +1194,6 @@ function selectWithdrawAsset(asset) {
         }
     }
     
-    // Actualizăm informațiile despre asset
     const assetInfo = document.getElementById('withdraw-asset-info');
     const availableInfo = document.getElementById('withdraw-available');
     
@@ -1367,7 +1205,6 @@ function selectWithdrawAsset(asset) {
         availableInfo.textContent = `Disponibil: ${asset.quantity.toFixed(6)} ${asset.symbol}`;
     }
     
-    // Afișăm butonul "Folosește tot"
     const useMaxBtn = document.getElementById('use-max-withdraw');
     if (useMaxBtn) {
         useMaxBtn.style.display = 'block';
@@ -1380,7 +1217,6 @@ function selectWithdrawAsset(asset) {
         };
     }
     
-    // Recalculăm valoarea
     calculateWithdrawValue();
 }
 
@@ -1429,7 +1265,7 @@ function handleWithdrawConfirm() {
     const quantity = parseFloat(qtyInput.value);
 
     if (!symbol || quantity <= 0) {
-        showCustomAlert('Eroare: Selectează un asset și introdu o cantitate validă.');
+        showCustomAlert('Error: Select a coin and enter a valid quantity.');
         return;
     }
 
@@ -1437,33 +1273,29 @@ function handleWithdrawConfirm() {
     const availableQty = parseFloat(selectedOption.getAttribute('data-quantity')) || 0;
 
     if (quantity > availableQty) {
-        showCustomAlert('Eroare: Cantitate indisponibilă pentru retragere.');
+        showCustomAlert('Error: Quantity unavailable for withdrawal.');
         return;
     }
 
     const totalValue = quantity * price;
 
-    // Actualizăm asset-ul
     const assetIndex = userAssets.findIndex(a => a.symbol === symbol);
     if (assetIndex >= 0) {
         userAssets[assetIndex].quantity = parseFloat((userAssets[assetIndex].quantity - quantity).toFixed(6));
         if (userAssets[assetIndex].quantity <= 0) {
-            userAssets.splice(assetIndex, 1); // eliminăm asset-ul dacă ajunge la zero
+            userAssets.splice(assetIndex, 1);
         }
     }
 
-    // Actualizăm soldul
     currentBalance += totalValue;
     currentBalance = parseFloat(currentBalance.toFixed(2));
     const storageKeys = getStorageKeys();
     localStorage.setItem(storageKeys.balance, currentBalance);
     updateUI(currentBalance);
 
-    // Salvăm și reafișăm assets-urile
     saveUserAssets();
     renderAssets();
 
-    // Adăugăm tranzacția
     addTransaction('withdraw', {
         symbol: symbol,
         quantity: quantity,
@@ -1471,22 +1303,16 @@ function handleWithdrawConfirm() {
         price: price
     });
 
-    // Închidem modalul de retragere
     closeWithdrawModal();
 
-    // Deschidem modalul de verificare
-    openVerifyModal(totalValue, `Retragere reușită! ${quantity} ${symbol} (Valoare: €${formatPrice(totalValue)}) au fost convertite în balance.`);
+    openVerifyModal(totalValue, `Withdrawal successful! ${quantity} ${symbol} (Value: €${formatPrice(totalValue)}) has been converted to balance.`);
 }
 
-// =========================================================================
-// LOGICA MODALULUI SWAP (SCHIMBĂ)
-// =========================================================================
 
 async function openSwapModal() {
     const modal = document.getElementById('swapModal');
     if (!modal) return;
 
-    // Încercăm să încărcăm datele dacă lipsesc
     const loadedData = await ensureMarketDataLoaded();
     let coinsToUse = allMarketData;
     
@@ -1497,14 +1323,12 @@ async function openSwapModal() {
     populateSwapDropdowns(coinsToUse);
     modal.style.display = 'flex';
     
-    // Resetăm câmpurile
     document.getElementById('swap-quantity').value = '';
     document.getElementById('swap-receive-value').textContent = '0.00';
     document.getElementById('swap-from-info').textContent = '';
     document.getElementById('swap-to-info').textContent = '';
     document.getElementById('swap-available').textContent = '';
     
-    // Ascundem butonul "Folosește tot"
     const useMaxBtn = document.getElementById('use-max-swap');
     if (useMaxBtn) {
         useMaxBtn.style.display = 'none';
@@ -1517,22 +1341,20 @@ function closeSwapModal() {
         modal.style.display = 'none';
     }
     
-    // Resetăm dropdown-urile
     const fromWrapper = document.getElementById('swap-from-wrapper');
     const toWrapper = document.getElementById('swap-to-wrapper');
     if (fromWrapper) fromWrapper.classList.remove('active');
     if (toWrapper) toWrapper.classList.remove('active');
     
-    // Resetăm afișajele
     const fromSelected = document.getElementById('swap-from-selected');
     const toSelected = document.getElementById('swap-to-selected');
     if (fromSelected) {
         const text = fromSelected.querySelector('.dropdown-selected-text');
-        if (text) text.textContent = 'Selectează moneda...';
+        if (text) text.textContent = 'Select a coin...';
     }
     if (toSelected) {
         const text = toSelected.querySelector('.dropdown-selected-text');
-        if (text) text.textContent = 'Selectează moneda...';
+        if (text) text.textContent = 'Select a coin...';
     }
     
     const fromIcon = document.getElementById('swap-from-icon-preview');
@@ -1542,10 +1364,8 @@ function closeSwapModal() {
 }
 
 function populateSwapDropdowns(coins) {
-    // Populăm dropdown-ul "Din" cu assets-urile utilizatorului
     populateSwapFromDropdown();
     
-    // Populăm dropdown-ul "În" cu toate monedele disponibile
     populateSwapToDropdown(coins);
 }
 
@@ -1561,7 +1381,7 @@ function populateSwapFromDropdown() {
     
     const defaultOption = document.createElement('option');
     defaultOption.value = '';
-    defaultOption.textContent = userAssets.length > 0 ? 'Selectează moneda...' : 'Nu ai assets disponibile';
+    defaultOption.textContent = userAssets.length > 0 ? 'Select a coin...' : 'You have no assets available';
     defaultOption.disabled = true;
     defaultOption.selected = true;
     hiddenSelect.appendChild(defaultOption);
@@ -1617,12 +1437,11 @@ function populateSwapToDropdown(coins) {
     
     const defaultOption = document.createElement('option');
     defaultOption.value = '';
-    defaultOption.textContent = 'Selectează moneda...';
+    defaultOption.textContent = 'Select a coin...';
     defaultOption.disabled = true;
     defaultOption.selected = true;
     hiddenSelect.appendChild(defaultOption);
     
-    // Obținem simbolul monedei selectate în "Din" pentru a-l exclude
     const selectedFromSymbol = fromSelect ? fromSelect.options[fromSelect.selectedIndex]?.value : null;
     
     if (coins && coins.length > 0) {
@@ -1633,7 +1452,6 @@ function populateSwapToDropdown(coins) {
             
             if (!rawData) return;
             
-            // Excludem moneda selectată în "Din"
             if (selectedFromSymbol && symbol === selectedFromSymbol) {
                 return;
             }
@@ -1706,33 +1524,29 @@ function selectSwapFromAsset(asset) {
             hiddenSelect.selectedIndex = Array.from(hiddenSelect.options).indexOf(option);
         }
     }
-    
-    // Actualizăm informațiile
+
     const assetInfo = document.getElementById('swap-from-info');
     if (assetInfo) {
         assetInfo.textContent = `Preț: €${formatPrice(asset.currentPrice)} | Disponibil: ${asset.quantity.toFixed(6)}`;
     }
     
-    // Re-populăm dropdown-ul "În" pentru a exclude moneda selectată
     const loadedData = allMarketData.length > 0 ? allMarketData : null;
     if (loadedData) {
         populateSwapToDropdown(loadedData);
     }
     
-    // Resetăm selecția "În" dacă era aceeași monedă
     const toSelect = document.getElementById('swap-to-asset');
     const toSelected = document.getElementById('swap-to-selected');
     if (toSelect && toSelect.options[toSelect.selectedIndex]?.value === asset.symbol) {
         toSelect.selectedIndex = 0;
         if (toSelected) {
             const text = toSelected.querySelector('.dropdown-selected-text');
-            if (text) text.textContent = 'Selectează moneda...';
+            if (text) text.textContent = 'Select a coin...';
         }
         const toIcon = document.getElementById('swap-to-icon-preview');
         if (toIcon) toIcon.innerHTML = '';
     }
     
-    // Afișăm butonul "Folosește tot"
     const useMaxBtn = document.getElementById('use-max-swap');
     if (useMaxBtn) {
         useMaxBtn.style.display = 'block';
@@ -1785,12 +1599,11 @@ function selectSwapToAsset(coin) {
         }
     }
     
-    // Actualizăm informațiile
     const assetInfo = document.getElementById('swap-to-info');
     if (assetInfo) {
         const changeClass = change24h >= 0 ? 'positive' : 'negative';
         const changeSign = change24h >= 0 ? '+' : '';
-        assetInfo.innerHTML = `Preț: €${formatPrice(price)} | <span class="${changeClass}">${changeSign}${change24h.toFixed(2)}%</span>`;
+        assetInfo.innerHTML = `Price: €${formatPrice(price)} | <span class="${changeClass}">${changeSign}${change24h.toFixed(2)}%</span>`;
     }
     
     calculateSwapValue();
@@ -1819,8 +1632,7 @@ function calculateSwapValue() {
     const toPrice = parseFloat(toOption.getAttribute('data-price'));
     const availableQty = parseFloat(fromOption.getAttribute('data-quantity'));
     
-    if (fromPrice && toPrice && quantity > 0) {
-        // Calculăm cât va primi: (cantitate * preț_from) / preț_to
+    if (fromPrice && toPrice && quantity > 0) { 
         const fromValue = quantity * fromPrice;
         const receiveQuantity = fromValue / toPrice;
         
@@ -1853,21 +1665,18 @@ function setupSwapModal() {
         }
     });
     
-    // Dropdown "Din"
     fromSelected.addEventListener('click', (e) => {
         e.stopPropagation();
         fromWrapper.classList.toggle('active');
         toWrapper.classList.remove('active');
     });
     
-    // Dropdown "În"
     toSelected.addEventListener('click', (e) => {
         e.stopPropagation();
         toWrapper.classList.toggle('active');
         fromWrapper.classList.remove('active');
     });
     
-    // Închidem dropdown-urile când se face click în afara lor
     document.addEventListener('click', (e) => {
         if (!fromWrapper.contains(e.target)) {
             fromWrapper.classList.remove('active');
@@ -1893,23 +1702,22 @@ function handleSwapConfirm() {
     const quantity = parseFloat(quantityInput.value);
     
     if (!fromOption || !fromOption.value) {
-        showCustomAlert('Eroare: Selectează moneda de schimbat.');
+        showCustomAlert('Error: Select a coin to swap.');
         return;
     }
     
     if (!toOption || !toOption.value) {
-        showCustomAlert('Eroare: Selectează moneda în care să schimbi.');
+        showCustomAlert('Error: Select a coin to swap to.');
         return;
     }
     
-    // Verificăm că nu schimbă aceeași monedă
     if (fromOption.value === toOption.value) {
-        showCustomAlert('Eroare: Nu poți schimba o monedă cu ea însăși.');
+        showCustomAlert('Error: You cannot swap a coin with itself.');
         return;
     }
     
     if (!quantity || quantity <= 0) {
-        showCustomAlert('Eroare: Introdu o cantitate validă.');
+        showCustomAlert('Error: Enter a valid quantity.');
         return;
     }
     
@@ -1918,40 +1726,33 @@ function handleSwapConfirm() {
     const toIconUrl = toOption.getAttribute('data-icon');
     const toFullName = toOption.textContent.split(' - ')[1] || toOption.value;
     
-    // Găsim asset-ul "din" în lista utilizatorului pentru a obține cantitatea reală actualizată
     const fromAssetIndex = userAssets.findIndex(a => a.symbol === fromOption.value);
     if (fromAssetIndex === -1) {
-        showCustomAlert('Eroare: Asset-ul nu a fost găsit.');
+        showCustomAlert('Error: Asset not found.');
         return;
     }
     
     const fromAsset = userAssets[fromAssetIndex];
-    const availableQty = fromAsset.quantity; // Folosim cantitatea reală din asset, nu din atribut
+    const availableQty = fromAsset.quantity;
     
-    // Verificăm dacă utilizatorul are suficiente monede
     if (quantity > availableQty) {
-        showCustomAlert(`Eroare: Nu ai suficiente ${fromOption.value}. Disponibil: ${availableQty.toFixed(6)}`);
+        showCustomAlert(`Error: You do not have enough ${fromOption.value}. Available: ${availableQty.toFixed(6)}`);
         return;
     }
     
-    // Calculăm cât va primi
     const fromValue = quantity * fromPrice;
     const receiveQuantity = fromValue / toPrice;
     
-    // Scădem cantitatea din asset-ul "din"
     fromAsset.quantity -= quantity;
     fromAsset.quantity = parseFloat(fromAsset.quantity.toFixed(6));
     
-    // Dacă cantitatea a ajuns la 0, eliminăm asset-ul
     if (fromAsset.quantity <= 0) {
         userAssets.splice(fromAssetIndex, 1);
     }
     
-    // Adăugăm sau actualizăm asset-ul "în"
     const toAssetIndex = userAssets.findIndex(a => a.symbol === toOption.value);
     
     if (toAssetIndex >= 0) {
-        // Actualizăm asset-ul existent
         const existingAsset = userAssets[toAssetIndex];
         const totalValue = (existingAsset.quantity * existingAsset.currentPrice) + (receiveQuantity * toPrice);
         const totalQuantity = existingAsset.quantity + receiveQuantity;
@@ -1964,7 +1765,6 @@ function handleSwapConfirm() {
             currentPrice: toPrice
         };
     } else {
-        // Adăugăm un asset nou
         userAssets.push({
             symbol: toOption.value,
             fullName: toFullName,
@@ -1977,12 +1777,10 @@ function handleSwapConfirm() {
         });
     }
     
-    // Salvăm modificările
     saveUserAssets();
     renderAssets();
-    updateUI(currentBalance); // Actualizăm UI-ul pentru a reflecta noua valoare a portofelului
+    updateUI(currentBalance);
     
-    // Adăugăm tranzacția
     addTransaction('swap', {
         fromSymbol: fromOption.value,
         fromQuantity: quantity,
@@ -1992,12 +1790,10 @@ function handleSwapConfirm() {
         toPrice: toPrice
     });
     
-    // Închidem modalul
-    closeSwapModal();
+        closeSwapModal();
     
-    // Deschidem modalul de verificare
     openVerifyModal(
         fromValue, 
-        `Schimbare reușită! ${quantity.toFixed(6)} ${fromOption.value} au fost schimbate în ${receiveQuantity.toFixed(6)} ${toOption.value}.`
+        `Swap successful! ${quantity.toFixed(6)} ${fromOption.value} has been swapped for ${receiveQuantity.toFixed(6)} ${toOption.value}.`
     );
 }

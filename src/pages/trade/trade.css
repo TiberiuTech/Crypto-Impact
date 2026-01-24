@@ -2,12 +2,12 @@
     padding: 20px;
     max-width: 100%;
     margin: 0;
-    min-height: calc(100vh - 80px); /* Înălțime completă minus navbar */
+    min-height: calc(100vh - 80px);
     display: flex;
     flex-direction: column;
     background-color: #0D1117;
-    justify-content: center; /* Centrare verticală */
-    align-items: center; /* Centrare orizontală */
+    justify-content: center;
+    align-items: center;
 }
 
 .trade-main h1 {
@@ -25,7 +25,6 @@
     width: 100%;
 }
 
-/* Sidebar Stânga */
 .trade-sidebar {
     display: flex;
     flex-direction: column;
@@ -123,7 +122,6 @@
     font-size: 0.9em;
 }
 
-/* Centru: Grafic și Trading */
 .trade-center {
     display: flex;
     flex-direction: column;
@@ -158,7 +156,6 @@
     border-color: #34d399;
 }
 
-/* Custom Coin Dropdown */
 .custom-coin-dropdown-wrapper {
     position: relative;
     width: 100%;
@@ -256,7 +253,6 @@
     font-size: 0.85em;
 }
 
-/* Scrollbar pentru dropdown-ul de monede */
 .custom-coin-dropdown-options::-webkit-scrollbar {
     width: 6px;
 }
@@ -658,7 +654,6 @@
     color: #E6E6E6;
 }
 
-/* Scrollbar personalizat */
 .assets-list::-webkit-scrollbar,
 .pending-orders-list::-webkit-scrollbar,
 .trade-history-list::-webkit-scrollbar {
@@ -684,7 +679,6 @@
     background: #484F58;
 }
 
-/* Modal de Verificare */
 .modal {
     display: none;
     position: fixed;
@@ -757,9 +751,6 @@
     margin-top: 20px;
 }
 
-/* Responsive Design */
-
-/* Tablete mari și desktop-uri mici */
 @media (max-width: 1400px) {
     .trade-container {
         grid-template-columns: 250px 1fr 280px;
@@ -774,7 +765,6 @@
     }
 }
 
-/* Tablete */
 @media (max-width: 1200px) {
     .trade-main {
         padding: 15px;
@@ -806,7 +796,6 @@
     }
 }
 
-/* Tablete mici */
 @media (max-width: 992px) {
     .trade-main h1 {
         font-size: 1.8em;
@@ -826,12 +815,11 @@
     }
 }
 
-/* Mobile */
 @media (max-width: 768px) {
     .trade-main {
         padding: 20px 10px;
         min-height: calc(100vh - 60px);
-        justify-content: flex-start; /* Pe mobile, evităm centrarea pentru mai mult spațiu */
+        justify-content: flex-start;
     }
     
     .trade-main h1 {
@@ -904,7 +892,6 @@
     }
 }
 
-/* Mobile mic */
 @media (max-width: 480px) {
     .trade-main {
         padding: 15px 8px;
@@ -975,7 +962,6 @@
     }
 }
 
-/* Landscape pentru mobile */
 @media (max-width: 768px) and (orientation: landscape) {
     .chart-container {
         min-height: 200px;

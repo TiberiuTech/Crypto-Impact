@@ -1,6 +1,3 @@
-/* =========================================================================
- * 1. STILURI DE BAZĂ ȘI GENERALITĂȚI (BASE & TYPOGRAPHY)
- * ========================================================================= */
 html, body {
     margin: 0;
     padding: 0;
@@ -9,12 +6,11 @@ html, body {
 }
 
 body {
-    background-color: #0D1117; /* Fundal întunecat */
-    color: white; /* Text alb pentru toată pagina */
+    background-color: #0D1117;
+    color: white;
     font-family: Arial, sans-serif;
 }
 
-/* 1. RESET DE BAZA */
 * {
     box-sizing: border-box;
 }
@@ -22,18 +18,12 @@ h1 {
     color: white;
     margin-bottom: 30px;
     font-size: 2em;
-    padding: 0 30px; /* Adăugăm padding pentru a alinia cu marginea din body */
+    padding: 0 30px;
 }
 main {
     max-width: 1200px;
     margin: 0 auto;
 }
-
-
-
-/* =========================================================================
- * 3. STILURI DE UTILITY ȘI BUTOANE GENERALE (Folosite și în Wallet/Trade)
- * ========================================================================= */
 
 .action-button {
     padding: 12px 25px;
@@ -45,7 +35,7 @@ main {
 }
 
 .action-button.primary {
-    background-color: #FF5733; /* Portocaliu */
+    background-color: #FF5733;
     color: white;
 }
 
@@ -54,7 +44,7 @@ main {
 }
 
 .action-button.secondary {
-    background-color: #30363D; /* Gri închis */
+    background-color: #30363D;
     color: white;
     border: 1px solid #484f58;
 }

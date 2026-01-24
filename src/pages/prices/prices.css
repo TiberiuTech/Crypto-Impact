@@ -1,6 +1,3 @@
-/* =========================================================================
- * 1. STILURI CARUSEL (PRICE CAROUSEL)
- * ========================================================================= */
 #price-carousel-wrapper {
     margin: 30px;
 }
@@ -12,7 +9,6 @@
 }
 
 #price-carousel {
-    /* Containerul vizibil care ascunde scrollbar-ul */
     width: 100%;
     overflow-x: hidden; 
     white-space: nowrap; 
@@ -35,7 +31,7 @@
     margin-right: 15px;
     width: 180px; 
     height: 120px;
-    background-color: #161B22; /* Fundal item carusel */
+    background-color: #161B22;
     border: 1px solid #30363D;
     border-radius: 8px;
     cursor: pointer;
@@ -77,9 +73,6 @@
 }
 
 
-/* =========================================================================
- * 2. STILURI TABEL (CRYPTO TABLE)
- * ========================================================================= */
 .table-container {
     background-color: #161B22; 
     border-radius: 12px;
@@ -117,7 +110,6 @@
     border-bottom: none;
 }
 
-/* Lățimi Coloane */
 .table-container th:nth-child(1), .table-container td:nth-child(1) { width: 4%; }
 .table-container th:nth-child(2), .table-container td:nth-child(2) { width: 26%; }
 .table-container th:nth-child(3), .table-container td:nth-child(3) { width: 14%; }
@@ -127,7 +119,6 @@
 .table-container th:nth-child(7), .table-container td:nth-child(7) { width: 10%; }
 .table-container th:nth-child(8), .table-container td:nth-child(8) { width: 10%; }
 
-/* Procente (Pozitive/Negative) */
 .positive {
     color: #34d399; 
 }
@@ -135,7 +126,6 @@
     color: #f87171; 
 }
 
-/* Butonul Trade */
 .trade-button {
     background-color: #007bff;
     color: white;
@@ -153,9 +143,6 @@
 }
 
 
-/* =========================================================================
- * 3. STILURI MODAL ȘI GRAFICE (APEXCHARTS OVERRIDES)
- * ========================================================================= */
 .modal {
     display: none; 
     position: fixed; 
@@ -206,7 +193,6 @@
     margin-right: 15px;
 }
 
-/* Grila de statistici */
 .stats-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr); 
@@ -238,7 +224,6 @@
     margin-bottom: 30px;
 }
 
-/* Secțiunile de sub grafic */
 .details-section-grid {
     display: grid;
     grid-template-columns: 1fr 1fr; 
@@ -281,7 +266,6 @@
     background-color: #30363D;
 }
 
-/* ApexCharts Overrides (Tooltip) */
 .apexcharts-tooltip {
     background: #161B22 !important; 
     border: 1px solid #30363D !important;

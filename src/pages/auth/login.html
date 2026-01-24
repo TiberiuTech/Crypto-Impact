@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Orionix</title>
+    <title>Login</title>
     <link rel="stylesheet" href="../../style.css">
     <link rel="stylesheet" href="../../navbar/navbar.css">
     <link rel="stylesheet" href="auth.css">
@@ -13,7 +13,7 @@
     
     <main class="auth-main">
         <div class="auth-container">
-            <h1>Autentificare</h1>
+            <h1>Login</h1>
             
             <form id="login-form" class="auth-form">
                 <div class="form-group">
@@ -23,30 +23,28 @@
                 </div>
                 
                 <div class="form-group">
-                    <label for="login-password">Parolă</label>
+                    <label for="login-password">Password</label>
                     <input type="password" id="login-password" name="password" required autocomplete="current-password">
                     <span class="error-message" id="password-error"></span>
                 </div>
                 
-                <button type="submit" class="auth-submit-button primary">Autentifică-te</button>
+                <button type="submit" class="auth-submit-button primary">Login</button>
                 
                 <div class="auth-form-links">
-                    <p>Nu ai cont? <a href="register.html">Înregistrează-te</a></p>
+                    <p>Don't have an account? <a href="register.html">Register</a></p>
                 </div>
             </form>
         </div>
     </main>
 
-    <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-auth-compat.js"></script>
     <script>
-        // Așteptăm ca Firebase să fie încărcat complet
         window.addEventListener('load', function() {
             if (typeof firebase === 'undefined') {
-                console.error('Firebase SDK nu s-a încărcat!');
+                console.error('Firebase SDK not loaded!');
             } else {
-                console.log('Firebase SDK încărcat cu succes');
+                console.log('Firebase SDK loaded successfully');
             }
         });
     </script>

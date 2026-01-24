@@ -97,13 +97,11 @@ export class ChartRenderer {
     }
     
     /**
-     * Randează graficul mare (1H) în modal.
-     * @param {string} containerId - ID-ul containerului 'modalChart'.
-     * @param {Array<number>} data - Datele de preț.
-     * @param {boolean} isPositive - Dacă trendul este pozitiv.
+     * @param {string} containerId 
+     * @param {Array<number>} data 
+     * @param {boolean} isPositive 
      */
     renderModalChart(containerId, data, isPositive) {
-        // Graficul mare folosește acum date pe 1 oră.
         const color = isPositive ? '#34d399' : '#f87171';
 
         const options = {
@@ -111,7 +109,7 @@ export class ChartRenderer {
             chart: {
                 type: 'area',
                 height: 300, 
-                toolbar: { show: false }, // Ascunde meniul/bara de instrumente
+                toolbar: { show: false },
                 id: 'modalChartInstance'
             },
             dataLabels: { enabled: false },
@@ -119,7 +117,7 @@ export class ChartRenderer {
             fill: { type: 'gradient', gradient: { opacityFrom: 0.5, opacityTo: 0 } },
             colors: [color], 
             grid: { borderColor: '#30363D' },
-            xaxis: { labels: { show: false } }, // Fără etichete pe axa X
+            xaxis: { labels: { show: false } },
             yaxis: {
                 labels: {
                     formatter: (val) => '€' + formatPrice(val),
@@ -144,9 +142,6 @@ export class ChartRenderer {
         }
     }
 
-    /**
-     * Distruge graficul modal pentru a preveni bug-uri de re-render.
-     */
     destroyModalChart() {
         if (this.modalChart) {
             this.modalChart.destroy();

@@ -1,7 +1,3 @@
-/* =========================================================================
- * STILURI PAGINA WALLET (PORTOFEL)
- * [Rămâne identic, omitem pentru brevity]
- * ========================================================================= */
  .wallet-main {
     padding: 30px;
     max-width: 1000px;
@@ -306,24 +302,21 @@
 }
 
 .transaction-amount.transaction-type-deposit {
-    color: #ef4444; /* Roșu pentru depozit (scade din balanță) */
+    color: #ef4444;
 }
 
 .transaction-amount.transaction-type-add-funds {
-    color: #34d399; /* Verde pentru adăugare fonduri (crește balanța) */
+    color: #34d399;
 }
 
 .transaction-amount.transaction-type-withdraw {
-    color: #34d399; /* Verde pentru retragere (crește balanța) */
+    color: #34d399;
 }
 
 .transaction-amount.transaction-type-swap {
-    color: #a78bfa; /* Violet pentru swap (nu afectează balanța) */
+    color: #a78bfa;
 }
 
-/* =========================================================================
- * STILURI MODAL DEPOZIT (NOU)
- * ========================================================================= */
 
 .modal {
     display: none; 
@@ -481,7 +474,6 @@
     font-size: 0.9em;
 }
 
-/* Dropdown custom cu iconițe - full width */
 .full-width-dropdown {
     position: relative;
     width: 100%;
@@ -597,7 +589,6 @@
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
 }
 
-/* Scrollbar personalizat pentru dropdown */
 .custom-dropdown-options::-webkit-scrollbar {
     width: 8px;
 }
@@ -691,7 +682,6 @@
     color: #f87171;
 }
 
-/* Secțiunea de detalii despre monedă */
 .coin-details-section {
     margin-top: 8px;
     padding: 10px;
@@ -762,7 +752,6 @@
     display: none;
 }
 
-/* Stiluri pentru toate input-urile din modal */
 .modal-content input[type="number"],
 .modal-content input[type="text"] {
     width: 100%;
@@ -801,7 +790,6 @@
     opacity: 0.5;
 }
 
-/* Stiluri specifice pentru formularul de adăugare fonduri */
 #add-funds-form {
     margin-top: 20px;
 }
@@ -887,7 +875,6 @@
     width: 100%;
 }
 
-/* Modal de verificare */
 .verify-modal-content {
     text-align: center;
     padding: 40px 20px;
@@ -931,5 +918,4 @@
 @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
-}
 }
