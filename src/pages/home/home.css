@@ -70,20 +70,6 @@
     object-fit: cover;
 }
 
-.orionix-icon {
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #6F42C1 0%, #8B5CF6 100%);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 28px;
-    font-weight: bold;
-    color: #FFFFFF;
-    box-shadow: 0 4px 10px rgba(111, 66, 193, 0.4);
-}
-
 .crypto-name-section h2 {
     margin: 0;
     font-size: 1.5em;
@@ -230,7 +216,6 @@
     box-shadow: 0 6px 15px rgba(111, 66, 193, 0.4);
 }
 
-/* Loading state */
 .loading {
     opacity: 0.6;
     pointer-events: none;
@@ -254,7 +239,6 @@
     to { transform: rotate(360deg); }
 }
 
-/* Responsive design */
 @media (max-width: 1200px) {
     .cards-container {
         grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
