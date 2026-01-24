@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <title>Acasă - Orionix</title>
+    <link rel="stylesheet" href="../../style.css">
+    <link rel="stylesheet" href="../../navbar/navbar.css">
+    <link rel="stylesheet" href="home.css">
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+</head>
+<body>
+    <header id="navbar-placeholder"></header>
+    
+    <main class="home-main">
+        <h1>Bine ai venit pe Orionix</h1>
+        <p class="home-subtitle">Aici poți tranzacționa și monitoriza principalele criptomonede în timp real</p>
+        
+        <div class="cards-container">
+            <!-- Bitcoin Card -->
+            <div class="crypto-card" data-symbol="BTC">
+                <div class="card-header">
+                    <img id="btc-icon" src="https://www.cryptocompare.com/media/37746251/btc.png" alt="Bitcoin" class="crypto-icon">
+                    <div class="crypto-name-section">
+                        <h2>Bitcoin</h2>
+                        <span class="crypto-symbol">BTC</span>
+                    </div>
+                </div>
+                
+                <div class="card-body">
+                    <div class="price-section">
+                        <div class="price-label">Preț</div>
+                        <div id="btc-price" class="price-value">€0.00</div>
+                        <div id="btc-change" class="price-change">0.00%</div>
+                    </div>
+                    
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <span class="stat-label">Volum 24h</span>
+                            <span id="btc-volume" class="stat-value">€0</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Market Cap</span>
+                            <span id="btc-marketcap" class="stat-value">€0</span>
+                        </div>
+                    </div>
+                    
+                    <div class="chart-section">
+                        <div id="btc-chart" class="card-chart"></div>
+                    </div>
+                </div>
+                
+                <div class="card-footer">
+                    <button class="trade-button" onclick="navigateToTrade('BTC')">
+                        <span>Trade</span>
+                        <span class="arrow">→</span>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Orionix Card -->
+            <div class="crypto-card orionix-card" data-symbol="ORIONIX">
+                <div class="card-header">
+                    <div class="crypto-icon orionix-icon">Ω</div>
+                    <div class="crypto-name-section">
+                        <h2>Orionix</h2>
+                        <span class="crypto-symbol">ORIONIX</span>
+                    </div>
+                </div>
+                
+                <div class="card-body">
+                    <div class="price-section">
+                        <div class="price-label">Preț</div>
+                        <div id="orionix-price" class="price-value">€1.25</div>
+                        <div id="orionix-change" class="price-change positive">+5.43%</div>
+                    </div>
+                    
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <span class="stat-label">Volum 24h</span>
+                            <span id="orionix-volume" class="stat-value">€345,678</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Market Cap</span>
+                            <span id="orionix-marketcap" class="stat-value">€1,250,000</span>
+                        </div>
+                    </div>
+                    
+                    <div class="chart-section">
+                        <div id="orionix-chart" class="card-chart"></div>
+                    </div>
+                </div>
+                
+                <div class="card-footer">
+                    <button class="trade-button" onclick="navigateToTrade('ORIONIX')">
+                        <span>Trade</span>
+                        <span class="arrow">→</span>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Ethereum Card -->
+            <div class="crypto-card" data-symbol="ETH">
+                <div class="card-header">
+                    <img id="eth-icon" src="https://www.cryptocompare.com/media/37746238/eth.png" alt="Ethereum" class="crypto-icon">
+                    <div class="crypto-name-section">
+                        <h2>Ethereum</h2>
+                        <span class="crypto-symbol">ETH</span>
+                    </div>
+                </div>
+                
+                <div class="card-body">
+                    <div class="price-section">
+                        <div class="price-label">Preț</div>
+                        <div id="eth-price" class="price-value">€0.00</div>
+                        <div id="eth-change" class="price-change">0.00%</div>
+                    </div>
+                    
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <span class="stat-label">Volum 24h</span>
+                            <span id="eth-volume" class="stat-value">€0</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Market Cap</span>
+                            <span id="eth-marketcap" class="stat-value">€0</span>
+                        </div>
+                    </div>
+                    
+                    <div class="chart-section">
+                        <div id="eth-chart" class="card-chart"></div>
+                    </div>
+                </div>
+                
+                <div class="card-footer">
+                    <button class="trade-button" onclick="navigateToTrade('ETH')">
+                        <span>Trade</span>
+                        <span class="arrow">→</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="../../navbar/loadNavbar.js"></script>
+    <script type="module" src="home.js"></script>
+</body>
+</html>
+

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Știri Crypto - Orionix</title>
+    <link rel="stylesheet" href="../../style.css">
+    <link rel="stylesheet" href="../../navbar/navbar.css">
+    <link rel="stylesheet" href="news.css">
+</head>
+<body>
+    <header id="navbar-placeholder"></header>
+    
+    <main class="news-page">
+        <div class="news-header">
+            <h1>Știri Crypto</h1>
+            <p class="news-subtitle">Cele mai recente știri din lumea criptomonedelor</p>
+        </div>
+
+        <div class="news-filters">
+            <button class="filter-btn active" data-category="ALL">Toate</button>
+            <button class="filter-btn" data-category="BTC">Bitcoin</button>
+            <button class="filter-btn" data-category="ETH">Ethereum</button>
+            <button class="filter-btn" data-category="BLOCKCHAIN">Blockchain</button>
+            <button class="filter-btn" data-category="MARKET">Piață</button>
+        </div>
+
+        <div id="loading-news" class="loading-container">
+            <div class="spinner"></div>
+            <p>Se încarcă știrile...</p>
+        </div>
+
+        <div id="news-container" class="news-grid">
+            <!-- Știrile vor fi încărcate dinamic aici -->
+        </div>
+
+        <div id="error-message" class="error-message" style="display: none;">
+            <p>Nu s-au putut încărca știrile. Verifică conexiunea și încearcă din nou.</p>
+            <button onclick="location.reload()" class="retry-btn">Reîncarcă</button>
+        </div>
+    </main>
+
+    <script src="../../navbar/loadNavbar.js"></script>
+    <script type="module" src="news.js"></script>
+</body>
+</html>

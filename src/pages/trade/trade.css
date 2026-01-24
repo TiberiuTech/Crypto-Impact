@@ -1,0 +1,994 @@
+.trade-main {
+    padding: 20px;
+    max-width: 100%;
+    margin: 0;
+    min-height: calc(100vh - 80px); /* Înălțime completă minus navbar */
+    display: flex;
+    flex-direction: column;
+    background-color: #0D1117;
+    justify-content: center; /* Centrare verticală */
+    align-items: center; /* Centrare orizontală */
+}
+
+.trade-main h1 {
+    margin: 0 0 30px 0;
+    padding: 0;
+    text-align: center;
+    font-size: 2.2em;
+}
+
+.trade-container {
+    display: grid;
+    grid-template-columns: 280px 1fr 320px;
+    gap: 20px;
+    max-width: 1800px;
+    width: 100%;
+}
+
+/* Sidebar Stânga */
+.trade-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.wallet-info-card {
+    background-color: #161B22;
+    border: 1px solid #30363D;
+    border-radius: 8px;
+    padding: 20px;
+}
+
+.wallet-info-card h3 {
+    color: #8B949E;
+    font-size: 0.9em;
+    margin-bottom: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.balance-display {
+    font-size: 2em;
+    font-weight: bold;
+    color: #34d399;
+}
+
+.assets-section {
+    background-color: #161B22;
+    border: 1px solid #30363D;
+    border-radius: 8px;
+    padding: 20px;
+}
+
+.assets-section h3 {
+    color: #E6E6E6;
+    font-size: 1.1em;
+    margin-bottom: 15px;
+}
+
+.assets-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.asset-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    background-color: #0D1117;
+    border: 1px solid #30363D;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.asset-item:hover {
+    background-color: #1C2128;
+    border-color: #484F58;
+}
+
+.asset-item.active {
+    border-color: #34d399;
+    background-color: rgba(52, 211, 153, 0.1);
+}
+
+.asset-item img {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+}
+
+.asset-item-info {
+    flex: 1;
+}
+
+.asset-item-name {
+    color: #E6E6E6;
+    font-weight: 600;
+    font-size: 0.9em;
+}
+
+.asset-item-quantity {
+    color: #8B949E;
+    font-size: 0.85em;
+}
+
+.asset-item-value {
+    color: #34d399;
+    font-weight: 600;
+    font-size: 0.9em;
+}
+
+/* Centru: Grafic și Trading */
+.trade-center {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.coin-selector {
+    background-color: #161B22;
+    border: 1px solid #30363D;
+    border-radius: 8px;
+    padding: 15px;
+}
+
+.coin-selector label {
+    color: #8B949E;
+    font-size: 0.9em;
+    margin-right: 10px;
+}
+
+.coin-dropdown {
+    background-color: #0D1117;
+    border: 1px solid #30363D;
+    border-radius: 6px;
+    color: #E6E6E6;
+    padding: 8px 12px;
+    font-size: 1em;
+    cursor: pointer;
+}
+
+.coin-dropdown:focus {
+    outline: none;
+    border-color: #34d399;
+}
+
+/* Custom Coin Dropdown */
+.custom-coin-dropdown-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+.custom-coin-dropdown-selected {
+    background-color: #0D1117;
+    border: 1px solid #30363D;
+    border-radius: 6px;
+    padding: 8px 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.custom-coin-dropdown-selected:hover {
+    border-color: #34d399;
+}
+
+.custom-coin-dropdown-display {
+    display: flex;
+    align-items: center;
+    color: #E6E6E6;
+    font-size: 1em;
+}
+
+.custom-coin-dropdown-text {
+    flex: 1;
+}
+
+.custom-coin-dropdown-arrow {
+    color: #8B949E;
+    font-size: 0.8em;
+    transition: transform 0.2s;
+}
+
+.custom-coin-dropdown-wrapper.active .custom-coin-dropdown-arrow {
+    transform: rotate(180deg);
+}
+
+.custom-coin-dropdown-options {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background-color: #161B22;
+    border: 1px solid #30363D;
+    border-radius: 6px;
+    margin-top: 4px;
+    max-height: 300px;
+    overflow-y: auto;
+    z-index: 1000;
+    display: none;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.custom-coin-dropdown-wrapper.active .custom-coin-dropdown-options {
+    display: block;
+}
+
+.custom-coin-dropdown-option {
+    display: flex;
+    align-items: center;
+    padding: 10px 12px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    gap: 10px;
+}
+
+.custom-coin-dropdown-option:hover {
+    background-color: #0D1117;
+}
+
+.custom-coin-dropdown-option img {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.custom-coin-dropdown-option-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.custom-coin-dropdown-option-name {
+    color: #E6E6E6;
+    font-size: 0.9em;
+    font-weight: 500;
+}
+
+.custom-coin-dropdown-option-symbol {
+    color: #8B949E;
+    font-size: 0.85em;
+}
+
+/* Scrollbar pentru dropdown-ul de monede */
+.custom-coin-dropdown-options::-webkit-scrollbar {
+    width: 6px;
+}
+
+.custom-coin-dropdown-options::-webkit-scrollbar-track {
+    background: #0D1117;
+}
+
+.custom-coin-dropdown-options::-webkit-scrollbar-thumb {
+    background: #30363D;
+    border-radius: 3px;
+}
+
+.custom-coin-dropdown-options::-webkit-scrollbar-thumb:hover {
+    background: #484F58;
+}
+
+.coin-info {
+    margin-top: 10px;
+    color: #8B949E;
+    font-size: 0.85em;
+}
+
+.chart-container {
+    background-color: #161B22;
+    border: 1px solid #30363D;
+    border-radius: 8px;
+    padding: 20px;
+    min-height: 400px;
+}
+
+#trade-chart {
+    width: 100%;
+    height: 400px;
+}
+
+.trade-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.trade-btn {
+    flex: 1;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 6px;
+    font-size: 1em;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.buy-btn {
+    background-color: #34d399;
+    color: #0D1117;
+}
+
+.buy-btn:hover {
+    background-color: #2bc488;
+    transform: translateY(-2px);
+}
+
+.sell-btn {
+    background-color: #f87171;
+    color: #0D1117;
+}
+
+.sell-btn:hover {
+    background-color: #f05959;
+    transform: translateY(-2px);
+}
+
+/* Trade Modals */
+.trade-modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(4px);
+}
+
+.trade-modal.show {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.trade-modal-content {
+    background-color: #161B22;
+    border: 1px solid #30363D;
+    border-radius: 8px;
+    padding: 30px;
+    max-width: 450px;
+    width: 90%;
+    position: relative;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+}
+
+.trade-modal-content h2 {
+    color: #E6E6E6;
+    margin-bottom: 20px;
+    font-size: 1.5em;
+}
+
+.trade-modal-close {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    color: #8B949E;
+    font-size: 2em;
+    font-weight: bold;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.trade-modal-close:hover {
+    color: #E6E6E6;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    color: #8B949E;
+    font-size: 0.85em;
+    margin-bottom: 5px;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 10px;
+    background-color: #0D1117;
+    border: 1px solid #30363D;
+    border-radius: 6px;
+    color: #E6E6E6;
+    font-size: 1em;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: #34d399;
+}
+
+.form-group input[readonly] {
+    background-color: #1C2128;
+    cursor: not-allowed;
+}
+
+.total-display {
+    color: #34d399;
+    font-size: 1.3em;
+    font-weight: bold;
+    padding: 10px;
+    background-color: rgba(52, 211, 153, 0.1);
+    border-radius: 6px;
+    text-align: center;
+}
+
+.confirm-btn {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 6px;
+    font-size: 1em;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-top: 10px;
+}
+
+.buy-confirm {
+    background-color: #34d399;
+    color: #0D1117;
+}
+
+.buy-confirm:hover {
+    background-color: #2bc488;
+}
+
+.sell-confirm {
+    background-color: #f87171;
+    color: #0D1117;
+}
+
+.sell-confirm:hover {
+    background-color: #f05959;
+}
+
+/* Sidebar Dreapta */
+.trade-sidebar-right {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.limit-orders-section,
+.pending-orders-section,
+.trade-history-section {
+    background-color: #161B22;
+    border: 1px solid #30363D;
+    border-radius: 8px;
+    padding: 20px;
+    padding-right: 10px;
+}
+
+.limit-orders-section h3,
+.pending-orders-section h3,
+.trade-history-section h3 {
+    color: #E6E6E6;
+    font-size: 1.1em;
+    margin-bottom: 15px;
+}
+
+.limit-order-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.order-type-select {
+    background-color: #0D1117;
+    border: 1px solid #30363D;
+    border-radius: 6px;
+    color: #E6E6E6;
+    padding: 8px 12px;
+    font-size: 1em;
+    cursor: pointer;
+}
+
+.price-shortcuts {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.price-shortcut-btn {
+    flex: 1;
+    padding: 6px 12px;
+    background-color: #a78bfa;
+    color: #0D1117;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.85em;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.price-shortcut-btn:hover {
+    background-color: #8b5cf6;
+    transform: translateY(-1px);
+}
+
+.limit-order-btn {
+    padding: 12px;
+    background-color: #34d399;
+    color: #0D1117;
+    border: none;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 1em;
+}
+
+.limit-order-btn:hover {
+    background-color: #2bc488;
+    transform: translateY(-2px);
+}
+
+.order-type-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.order-type-btn {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 0.95em;
+}
+
+.buy-type-btn {
+    background-color: rgba(52, 211, 153, 0.2);
+    color: #34d399;
+    border: 1px solid #34d399;
+}
+
+.buy-type-btn:hover {
+    background-color: rgba(52, 211, 153, 0.3);
+}
+
+.buy-type-btn.active {
+    background-color: #34d399;
+    color: #0D1117;
+    border-color: #34d399;
+}
+
+.sell-type-btn {
+    background-color: rgba(248, 113, 113, 0.2);
+    color: #f87171;
+    border: 1px solid #f87171;
+}
+
+.sell-type-btn:hover {
+    background-color: rgba(248, 113, 113, 0.3);
+}
+
+.sell-type-btn.active {
+    background-color: #f87171;
+    color: #0D1117;
+    border-color: #f87171;
+}
+
+.pending-orders-list,
+.trade-history-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-height: 300px;
+    overflow-y: auto;
+    padding-right: 10px;
+}
+
+.pending-order-item,
+.history-item {
+    padding: 12px;
+    background-color: #0D1117;
+    border: 1px solid #30363D;
+    border-radius: 6px;
+    font-size: 0.85em;
+}
+
+.pending-order-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.order-type-badge {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-weight: 600;
+    font-size: 0.8em;
+}
+
+.order-type-buy {
+    background-color: rgba(52, 211, 153, 0.2);
+    color: #34d399;
+}
+
+.order-type-sell {
+    background-color: rgba(248, 113, 113, 0.2);
+    color: #f87171;
+}
+
+.order-details {
+    flex: 1;
+    margin-left: 10px;
+}
+
+.order-price {
+    color: #E6E6E6;
+    font-weight: 600;
+}
+
+.order-quantity {
+    color: #8B949E;
+    font-size: 0.9em;
+}
+
+.cancel-order-btn {
+    padding: 4px 8px;
+    background-color: #f87171;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 0.8em;
+    cursor: pointer;
+}
+
+.history-item {
+    color: #8B949E;
+}
+
+.history-item-type {
+    font-weight: 600;
+    color: #E6E6E6;
+}
+
+/* Scrollbar personalizat */
+.assets-list::-webkit-scrollbar,
+.pending-orders-list::-webkit-scrollbar,
+.trade-history-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.assets-list::-webkit-scrollbar-track,
+.pending-orders-list::-webkit-scrollbar-track,
+.trade-history-list::-webkit-scrollbar-track {
+    background: #0D1117;
+}
+
+.assets-list::-webkit-scrollbar-thumb,
+.pending-orders-list::-webkit-scrollbar-thumb,
+.trade-history-list::-webkit-scrollbar-thumb {
+    background: #30363D;
+    border-radius: 3px;
+}
+
+.assets-list::-webkit-scrollbar-thumb:hover,
+.pending-orders-list::-webkit-scrollbar-thumb:hover,
+.trade-history-list::-webkit-scrollbar-thumb:hover {
+    background: #484F58;
+}
+
+/* Modal de Verificare */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 2000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(4px);
+    align-items: center;
+    justify-content: center;
+}
+
+.modal.show {
+    display: flex !important;
+}
+
+.verify-modal-content {
+    text-align: center;
+    padding: 40px 20px;
+    background-color: #161B22;
+    border: 1px solid #30363D;
+    border-radius: 8px;
+    max-width: 400px;
+    width: 90%;
+}
+
+.verify-icon {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 20px;
+    background-color: rgba(52, 211, 153, 0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3em;
+    color: #34d399;
+    border: 3px solid #34d399;
+}
+
+.verify-loader {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.spinner {
+    width: 50px;
+    height: 50px;
+    border: 4px solid rgba(52, 211, 153, 0.2);
+    border-top: 4px solid #34d399;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+#verify-message {
+    color: #E6E6E6;
+    font-size: 1.1em;
+    margin-top: 20px;
+}
+
+/* Responsive Design */
+
+/* Tablete mari și desktop-uri mici */
+@media (max-width: 1400px) {
+    .trade-container {
+        grid-template-columns: 250px 1fr 280px;
+    }
+    
+    .chart-container {
+        min-height: 350px;
+    }
+    
+    #trade-chart {
+        height: 350px;
+    }
+}
+
+/* Tablete */
+@media (max-width: 1200px) {
+    .trade-main {
+        padding: 15px;
+    }
+    
+    .trade-container {
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+    }
+    
+    .trade-sidebar {
+        grid-column: 1 / 2;
+    }
+    
+    .trade-center {
+        grid-column: 2 / 3;
+    }
+    
+    .trade-sidebar-right {
+        grid-column: 1 / 3;
+    }
+    
+    .chart-container {
+        min-height: 300px;
+    }
+    
+    #trade-chart {
+        height: 300px;
+    }
+}
+
+/* Tablete mici */
+@media (max-width: 992px) {
+    .trade-main h1 {
+        font-size: 1.8em;
+    }
+    
+    .balance-display {
+        font-size: 1.6em;
+    }
+    
+    .assets-list {
+        max-height: 250px;
+    }
+    
+    .pending-orders-list,
+    .trade-history-list {
+        max-height: 200px;
+    }
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+    .trade-main {
+        padding: 20px 10px;
+        min-height: calc(100vh - 60px);
+        justify-content: flex-start; /* Pe mobile, evităm centrarea pentru mai mult spațiu */
+    }
+    
+    .trade-main h1 {
+        font-size: 1.5em;
+        margin-bottom: 15px;
+        text-align: left;
+    }
+    
+    .trade-container {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+    
+    .trade-sidebar,
+    .trade-center,
+    .trade-sidebar-right {
+        grid-column: 1 / 2;
+    }
+    
+    .wallet-info-card,
+    .assets-section,
+    .coin-selector,
+    .chart-container,
+    .limit-orders-section,
+    .pending-orders-section,
+    .trade-history-section {
+        padding: 15px;
+    }
+    
+    .chart-container {
+        min-height: 250px;
+    }
+    
+    #trade-chart {
+        height: 250px;
+    }
+    
+    .balance-display {
+        font-size: 1.4em;
+    }
+    
+    .trade-actions {
+        flex-direction: column;
+    }
+    
+    .trade-btn {
+        width: 100%;
+        padding: 14px;
+    }
+    
+    .asset-item {
+        padding: 12px 8px;
+    }
+    
+    .asset-item img {
+        width: 28px;
+        height: 28px;
+    }
+    
+    .custom-coin-dropdown-options {
+        max-height: 200px;
+    }
+    
+    .order-type-buttons {
+        flex-direction: column;
+    }
+    
+    .price-shortcuts {
+        flex-direction: row;
+    }
+}
+
+/* Mobile mic */
+@media (max-width: 480px) {
+    .trade-main {
+        padding: 15px 8px;
+    }
+    
+    .trade-main h1 {
+        font-size: 1.3em;
+        margin-bottom: 10px;
+        text-align: left;
+    }
+    
+    .trade-container {
+        gap: 10px;
+    }
+    
+    .wallet-info-card,
+    .assets-section,
+    .coin-selector,
+    .chart-container,
+    .limit-orders-section,
+    .pending-orders-section,
+    .trade-history-section {
+        padding: 12px;
+    }
+    
+    .wallet-info-card h3,
+    .assets-section h3,
+    .limit-orders-section h3,
+    .pending-orders-section h3,
+    .trade-history-section h3 {
+        font-size: 0.95em;
+    }
+    
+    .balance-display {
+        font-size: 1.2em;
+    }
+    
+    .chart-container {
+        min-height: 200px;
+    }
+    
+    #trade-chart {
+        height: 200px;
+    }
+    
+    .trade-btn {
+        padding: 12px;
+        font-size: 0.95em;
+    }
+    
+    .trade-modal-content {
+        padding: 20px;
+        width: 95%;
+    }
+    
+    .trade-modal-content h2 {
+        font-size: 1.3em;
+    }
+    
+    .form-group input {
+        padding: 8px;
+        font-size: 0.95em;
+    }
+    
+    .confirm-btn {
+        padding: 10px;
+        font-size: 0.95em;
+    }
+}
+
+/* Landscape pentru mobile */
+@media (max-width: 768px) and (orientation: landscape) {
+    .chart-container {
+        min-height: 200px;
+    }
+    
+    #trade-chart {
+        height: 200px;
+    }
+    
+    .assets-list,
+    .pending-orders-list,
+    .trade-history-list {
+        max-height: 150px;
+    }
+}
+

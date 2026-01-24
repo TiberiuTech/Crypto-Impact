@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <title>Lista Criptomonede</title>
+    <!-- Includem fișierul de stiluri (cale relativă pentru pagini în subfoldere) -->
+    <link rel="stylesheet" href="../../style.css">
+    <!-- Includem stiluri navbar -->
+    <link rel="stylesheet" href="../../navbar/navbar.css">
+    <!-- Includem stiluri specifice pentru această pagină (carousel, tabel, modal) -->
+    <link rel="stylesheet" href="prices.css">
+    
+    <!-- Includem biblioteca de grafice ApexCharts (FOARTE IMPORTANT!) -->
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+
+</head>
+<body>
+
+    <header id="navbar-placeholder"></header>
+    
+    <main>
+        <h1>Lista Criptomonede</h1>
+        
+        <!-- 🛑 NOU: CONTAINER CARUSEL 🛑 -->
+        <!-- Caruselul afișează primele 10 monede cu preț, schimb și mini-grafic -->
+        <div id="price-carousel-wrapper">
+            <h2>Prețuri în Timp Real (Ultimele 1H)</h2>
+            <div id="price-carousel">
+                <!-- Conținutul caruselului va fi injectat de JavaScript (src/client.js) -->
+            </div>
+        </div>
+        
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Coin</th>
+                        <th>Prices</th>
+                        <th>24h %</th>
+                        <th>VOL.24H</th>
+                        <th>Market Cap.</th>
+                        <th>Chart 1H</th>
+                        <th>Trade</th>
+                    </tr>
+                </thead>
+                
+                <tbody id="crypto-table-body">
+                    <!-- Rândurile tabelului vor fi adăugate aici de JavaScript -->
+                </tbody>
+                
+            </table>
+        </div>
+        
+    </main>
+
+    <!-- 🛑 MODALUL PENTRU DETALII MONEDĂ 🛑 -->
+    <div id="coinModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <div id="modal-header">
+                <!-- Iconiță și Titlu -->
+                <h2 id="modal-coin-title"></h2>
+            </div>
+            
+            <div id="modal-stats" class="stats-grid">
+                <!-- Preț, Market Cap, Volum vor veni aici -->
+            </div>
+            
+            <div id="modal-chart-container">
+                <!-- Graficul mare va veni aici -->
+            </div>
+            
+            <!-- 🛑 NOI SECȚIUNI SUB GRAFIC 🛑 -->
+            <div class="details-section-grid">
+                <!-- Secțiune 1: High/Low 24h -->
+                <div id="modal-high-low" class="high-low-box">
+                    <h3 class="section-title">Vârf & Bază (24h)</h3>
+                    <div id="high-low-data" class="stats-grid-2">
+                        <!-- Datele High/Low vor fi injectate aici -->
+                    </div>
+                </div>
+
+                <!-- Secțiune 2: Link-uri Utile (Simulat) -->
+                <div id="modal-links" class="links-box">
+                    <h3 class="section-title">Link-uri Utile</h3>
+                    <div class="link-list">
+                        <a href="#" target="_blank" class="simulated-link">Website Oficial</a>
+                    </div>
+                </div>
+            </div>
+            <!-- 🛑 SFÂRȘIT SECȚIUNI NOI 🛑 -->
+        </div>
+    </div>
+    <!-- 🛑 SFÂRȘIT MODAL 🛑 -->
+
+    <!-- Scripturile modulare (la finalul paginii) -->
+    <script src="../../navbar/loadNavbar.js"></script>
+    <script type="module" src="../../client.js"></script>
+
+</body>
+</html>

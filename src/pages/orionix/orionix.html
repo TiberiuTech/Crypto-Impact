@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="utf-8">
+  <title>Orionix Token - Custom ERC-20</title>
+  <link rel="stylesheet" href="../../style.css">
+  <link rel="stylesheet" href="../../navbar/navbar.css">
+  <link rel="stylesheet" href="orionix.css">
+  <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+</head>
+<body>
+  <header id="navbar-placeholder"></header>
+  
+  <main class="orionix-main">
+    <h1>Orionix Token (ORX)</h1>
+    <p class="subtitle">Moneda de test - Date simulate pentru demonstrație</p>
+
+    <!-- Demo Token Dashboard -->
+    <div class="demo-token-dashboard">
+      <div class="demo-token-header">
+        <div class="demo-token-icon">🌟</div>
+        <div class="demo-token-info">
+          <h2>Orionix Token</h2>
+          <span class="demo-token-symbol">ORX</span>
+        </div>
+        <div class="demo-token-price">
+          <div class="price-value" id="orx-price">$0.00</div>
+          <div class="price-change" id="orx-change">+0.00%</div>
+        </div>
+      </div>
+
+      <div class="demo-stats-grid">
+        <div class="stat-card">
+          <div class="stat-label">Preț</div>
+          <div class="stat-value" id="orx-current-price">$0.00</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Market Cap</div>
+          <div class="stat-value" id="orx-market-cap">$0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Volum 24h</div>
+          <div class="stat-value" id="orx-volume">$0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Supply</div>
+          <div class="stat-value">1,000,000 ORX</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">High 24h</div>
+          <div class="stat-value" id="orx-high">$0.00</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Low 24h</div>
+          <div class="stat-value" id="orx-low">$0.00</div>
+        </div>
+      </div>
+
+      <div class="demo-chart-container">
+        <h3>Grafic Preț (Live Simulation)</h3>
+        <div id="orx-chart"></div>
+      </div>
+
+      <div class="demo-actions">
+        <button class="demo-btn buy-demo-btn" id="simulate-buy-btn">
+          📈 Simulează Creștere Preț
+        </button>
+        <button class="demo-btn sell-demo-btn" id="simulate-sell-btn">
+          📉 Simulează Scădere Preț
+        </button>
+        <button class="demo-btn reset-demo-btn" id="reset-price-btn">
+          🔄 Reset Preț
+        </button>
+      </div>
+    </div>
+
+    <div class="separator"></div>
+
+    <h2 style="color: #E6E6E6; margin-top: 40px; text-align: center;">Interacțiune cu Token Real (MetaMask)</h2>
+    <p class="subtitle" style="text-align: center;">Conectează MetaMask pentru a interacționa cu tokeni reali ERC-20</p>
+
+    <div class="orionix-container">
+      <!-- Secțiunea de adăugare contract -->
+      <div class="add-contract-section">
+        <h2>Adaugă Contract Token</h2>
+        
+        <div class="metamask-status" id="metamask-status">
+          <span class="status-indicator" id="status-indicator"></span>
+          <span id="status-text">Verificare MetaMask...</span>
+        </div>
+
+        <button id="load-token-btn" class="action-btn primary-btn">
+          Conectează MetaMask
+        </button>
+      </div>
+
+      <!-- Secțiunea cu detalii despre token -->
+      <div class="token-details-section" id="token-details-section" style="display: none;">
+        <h2>Detalii Token</h2>
+        
+        <div class="token-info-card">
+          <div class="token-header">
+            <div class="token-icon" id="token-icon">🪙</div>
+            <div class="token-basic-info">
+              <h3 id="token-name">-</h3>
+              <p id="token-symbol">-</p>
+            </div>
+          </div>
+
+          <div class="token-stats">
+            <div class="stat-item">
+              <span class="stat-label">Balanță</span>
+              <span class="stat-value" id="token-balance">0</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">Zecimale</span>
+              <span class="stat-value" id="token-decimals">-</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">Contract</span>
+              <span class="stat-value contract-address" id="token-contract">-</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Acțiuni disponibile -->
+        <div class="token-actions">
+          <h3>Acțiuni</h3>
+          
+          <div class="actions-grid">
+            <button class="action-card" id="add-to-metamask-btn">
+              <span class="action-icon">🦊</span>
+              <span class="action-label">Adaugă în MetaMask</span>
+            </button>
+
+            <button class="action-card" id="transfer-btn">
+              <span class="action-icon">📤</span>
+              <span class="action-label">Transfer</span>
+            </button>
+
+            <button class="action-card" id="approve-btn">
+              <span class="action-icon">✅</span>
+              <span class="action-label">Approve</span>
+            </button>
+
+            <button class="action-card" id="refresh-balance-btn">
+              <span class="action-icon">🔄</span>
+              <span class="action-label">Reîmprospătează</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Transfer -->
+    <div id="transfer-modal" class="modal">
+      <div class="modal-content">
+        <span class="close-modal" id="close-transfer-modal">&times;</span>
+        <h2>Transfer Token</h2>
+        
+        <div class="form-group">
+          <label for="recipient-address">Adresă Destinatar</label>
+          <input 
+            type="text" 
+            id="recipient-address" 
+            placeholder="0x..."
+            class="modal-input"
+          >
+        </div>
+
+        <div class="form-group">
+          <label for="transfer-amount">Cantitate</label>
+          <input 
+            type="number" 
+            id="transfer-amount" 
+            placeholder="0.0"
+            step="any"
+            class="modal-input"
+          >
+          <small>Balanță disponibilă: <span id="available-balance">0</span></small>
+        </div>
+
+        <button id="confirm-transfer-btn" class="action-btn primary-btn">
+          Confirmă Transfer
+        </button>
+      </div>
+    </div>
+
+    <!-- Modal Approve -->
+    <div id="approve-modal" class="modal">
+      <div class="modal-content">
+        <span class="close-modal" id="close-approve-modal">&times;</span>
+        <h2>Approve Token</h2>
+        
+        <div class="form-group">
+          <label for="spender-address">Adresă Spender</label>
+          <input 
+            type="text" 
+            id="spender-address" 
+            placeholder="0x..."
+            class="modal-input"
+          >
+          <small>Adresa contractului care va putea folosi tokenurile tale</small>
+        </div>
+
+        <div class="form-group">
+          <label for="approve-amount">Cantitate</label>
+          <input 
+            type="number" 
+            id="approve-amount" 
+            placeholder="0.0"
+            step="any"
+            class="modal-input"
+          >
+          <small>Lasă gol pentru approve unlimited</small>
+        </div>
+
+        <button id="confirm-approve-btn" class="action-btn primary-btn">
+          Confirmă Approve
+        </button>
+      </div>
+    </div>
+  </main>
+
+  <script src="../../navbar/loadNavbar.js"></script>
+  <script type="module" src="orionix.js"></script>
+</body>
+</html>

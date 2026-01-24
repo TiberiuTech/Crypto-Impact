@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <title>Portofel - Orionix</title>
+    <!-- Stiluri Generale (Bază) -->
+    <link rel="stylesheet" href="../../style.css">
+    <!-- Stiluri Navigare -->
+    <link rel="stylesheet" href="../../navbar/navbar.css">
+    <!-- Stiluri Specifice Paginii Wallet -->
+    <link rel="stylesheet" href="wallet.css">
+    
+    <!-- Script de protecție - verifică autentificarea -->
+    <script src="../../utils/authGuard.js"></script>
+</head>
+<body>
+
+    <header id="navbar-placeholder"></header>
+    
+    <main class="wallet-main">
+        <h1>Portofelul Meu</h1>
+        
+        <div class="wallet-summary-card">
+            
+            <div class="wallet-header">
+                <!-- Stânga: Salut & Sold -->
+                <div class="user-info">
+                    
+                    <!-- Structură pentru Salutul Mare ("Hello! Nume") -->
+                    <div class="greeting-container">
+                        <span class="greeting-prefix">Hello!</span>
+                        <span id="greeting-name" class="greeting-name-large">Anonim</span>
+                    </div>
+
+                    <!-- Balanța și Valoarea Portofelului -->
+                    <div class="wallet-values">
+                        <div class="wallet-value-item">
+                            <span class="wallet-value-label">Balanță</span>
+                            <h2 class="balance-value">$123,456.78</h2> <!-- Soldul, actualizat de JS -->
+                        </div>
+                        <div class="wallet-value-item">
+                            <span class="wallet-value-label">Valoare Portofel</span>
+                            <h2 class="wallet-total-value">$0.00</h2> <!-- Valoarea totală a assets-urilor, actualizat de JS -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dreapta: GRUPUL DE ACȚIUNI ÎN COLOANĂ -->
+                <div class="action-column-group">
+                    
+                    <!-- Rândul 1: Butoane principale (Depozit/Retragere) -->
+                    <div class="main-actions">
+                        <button class="action-button primary">Depozit</button>
+                        <button class="action-button secondary">Retragere</button>
+                    </div>
+
+                    <!-- Rândul 2: Acțiuni secundare (Adaugă Fonduri/Swap) -->
+                    <div class="secondary-actions">
+                        <button class="action-button primary">
+                            Adaugă Fonduri
+                        </button>
+                        <button class="action-button secondary">
+                            Schimbă (Swap)
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <section class="wallet-assets">
+            <h2>Assets (Portofel)</h2>
+            <div id="assets-container" class="assets-container">
+                <p style="color: #8B949E; text-align: center; padding: 20px;">Nu ai assets încă. Fă un depozit pentru a începe!</p>
+            </div>
+        </section>
+
+        <section class="wallet-transactions">
+            <h2>Istoric Tranzacții</h2>
+            <div id="transactions-container" class="transactions-container">
+                <p style="color: #8B949E; text-align: center; padding: 20px;">Aici vor apărea tranzacțiile tale viitoare.</p>
+            </div>
+        </section>
+        
+    </main>
+
+    <!-- 🛑 MODALUL ADĂUGĂ FONDURI 🛑 -->
+    <div id="addFundsModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" id="close-add-funds">&times;</span>
+            <h2>Adaugă Fonduri</h2>
+            
+            <form id="add-funds-form">
+                <div class="form-group">
+                    <label for="funds-amount">Sumă (EUR):</label>
+                    <input type="number" id="funds-amount" min="1" step="0.01" placeholder="0.00" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="card-holder-name">Nume și Prenume:</label>
+                    <input type="text" id="card-holder-name" placeholder="Ion Popescu" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="card-number">Număr Card:</label>
+                    <input type="text" id="card-number" placeholder="1234 5678 9012 3456" maxlength="19" required>
+                </div>
+
+                <div class="form-group-row">
+                    <div class="form-group">
+                        <label for="card-expiry">Data Expirării:</label>
+                        <input type="text" id="card-expiry" placeholder="MM/YY" maxlength="5" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="card-cvv">CVV:</label>
+                        <input type="text" id="card-cvv" placeholder="123" maxlength="4" required>
+                    </div>
+                </div>
+
+                <button type="submit" id="confirm-add-funds-btn" class="action-button primary full-width">Confirmă</button>
+            </form>
+        </div>
+    </div>
+    <!-- 🛑 SFÂRȘIT MODAL ADĂUGĂ FONDURI 🛑 -->
+
+    <!-- 🛑 MODALUL RETRAGERE 🛑 -->
+    <div id="withdrawModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" id="close-withdraw">&times;</span>
+            <h2>Retragere Assets</h2>
+            
+            <div class="form-group">
+                <label for="withdraw-asset">Selectează Asset:</label>
+                <!-- Dropdown-ul custom pentru assets cu iconițe -->
+                <div class="custom-dropdown full-width-dropdown" id="withdraw-asset-wrapper">
+                    <div class="custom-dropdown-selected" id="withdraw-asset-selected">
+                        <div class="dropdown-text">
+                            <div id="withdraw-icon-preview-dropdown"></div>
+                            <span class="dropdown-selected-text">Selectează un asset...</span>
+                        </div>
+                        <span class="dropdown-arrow">▼</span>
+                    </div>
+                    <div class="custom-dropdown-options" id="withdraw-asset-options">
+                        <!-- Opțiunile vor fi populate de wallet.js -->
+                    </div>
+                    <!-- Input hidden pentru a păstra valoarea selectată -->
+                    <select id="withdraw-asset" class="hidden-select" style="display: none;">
+                        <!-- Opțiunile vor fi populate de wallet.js -->
+                    </select>
+                </div>
+                <div id="withdraw-asset-info" class="helper-text"></div>
+            </div>
+
+            <div class="form-group">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+                    <label for="withdraw-quantity" style="margin-bottom: 0;">Cantitate de retras:</label>
+                    <button type="button" id="use-max-withdraw" class="use-max-button" style="display: none;">Folosește tot</button>
+                </div>
+                <input type="number" id="withdraw-quantity" min="0.000001" step="any" placeholder="0.000000">
+                <div id="withdraw-available" class="helper-text"></div>
+            </div>
+
+            <div class="deposit-summary">
+                <p>Valoare estimată:</p>
+                <h3 id="withdraw-value">€0.00</h3>
+            </div>
+
+            <button id="confirm-withdraw-btn" class="action-button primary full-width">Confirmă Retragerea</button>
+        </div>
+    </div>
+    <!-- 🛑 SFÂRȘIT MODAL RETRAGERE 🛑 -->
+
+    <!-- 🛑 MODALUL SWAP (SCHIMBĂ) 🛑 -->
+    <div id="swapModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" id="close-swap">&times;</span>
+            <h2>Schimbă (Swap)</h2>
+            
+            <div class="form-group">
+                <label for="swap-from-asset">Din:</label>
+                <!-- Dropdown-ul custom pentru moneda de schimbat -->
+                <div class="custom-dropdown full-width-dropdown" id="swap-from-wrapper">
+                    <div class="custom-dropdown-selected" id="swap-from-selected">
+                        <div class="dropdown-text">
+                            <div id="swap-from-icon-preview"></div>
+                            <span class="dropdown-selected-text">Selectează moneda...</span>
+                        </div>
+                        <span class="dropdown-arrow">▼</span>
+                    </div>
+                    <div class="custom-dropdown-options" id="swap-from-options">
+                        <!-- Opțiunile vor fi populate de wallet.js -->
+                    </div>
+                    <select id="swap-from-asset" class="hidden-select" style="display: none;"></select>
+                </div>
+                <div id="swap-from-info" class="helper-text"></div>
+            </div>
+
+            <div class="swap-arrow-container">
+                <div class="swap-arrow">⇅</div>
+            </div>
+
+            <div class="form-group">
+                <label for="swap-to-asset">În:</label>
+                <!-- Dropdown-ul custom pentru moneda în care să schimbe -->
+                <div class="custom-dropdown full-width-dropdown" id="swap-to-wrapper">
+                    <div class="custom-dropdown-selected" id="swap-to-selected">
+                        <div class="dropdown-text">
+                            <div id="swap-to-icon-preview"></div>
+                            <span class="dropdown-selected-text">Selectează moneda...</span>
+                        </div>
+                        <span class="dropdown-arrow">▼</span>
+                    </div>
+                    <div class="custom-dropdown-options" id="swap-to-options">
+                        <!-- Opțiunile vor fi populate de wallet.js -->
+                    </div>
+                    <select id="swap-to-asset" class="hidden-select" style="display: none;"></select>
+                </div>
+                <div id="swap-to-info" class="helper-text"></div>
+            </div>
+
+            <div class="form-group">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+                    <label for="swap-quantity" style="margin-bottom: 0;">Cantitate:</label>
+                    <button type="button" id="use-max-swap" class="use-max-button" style="display: none;">Folosește tot</button>
+                </div>
+                <input type="number" id="swap-quantity" min="0.000001" step="any" placeholder="0.000000">
+                <div id="swap-available" class="helper-text"></div>
+            </div>
+
+            <div class="deposit-summary">
+                <p>Vei primi aproximativ:</p>
+                <h3 id="swap-receive-value">0.00</h3>
+            </div>
+
+            <button id="confirm-swap-btn" class="action-button primary full-width">Confirmă Schimbarea</button>
+        </div>
+    </div>
+    <!-- 🛑 SFÂRȘIT MODAL SWAP 🛑 -->
+
+    <!-- 🛑 MODALUL DE VERIFICARE 🛑 -->
+    <div id="verifyModal" class="modal">
+        <div class="modal-content verify-modal-content">
+            <div class="verify-icon">✓</div>
+            <h2>Verificare în curs...</h2>
+            <p id="verify-message">Te rugăm să aștepți în timp ce procesăm plata ta.</p>
+            <div class="verify-loader"></div>
+        </div>
+    </div>
+    <!-- 🛑 SFÂRȘIT MODAL DE VERIFICARE 🛑 -->
+
+    <!-- 🛑 MODALUL DE DEPOZIT 🛑 -->
+    <div id="depositModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <h2>Depune Criptomonedă</h2>
+            
+            <div class="form-group">
+                <label for="deposit-symbol">Selectează Moneda:</label>
+                <!-- Dropdown-ul custom pentru monede cu iconițe - full width -->
+                <div class="custom-dropdown full-width-dropdown" id="deposit-symbol-wrapper">
+                    <div class="custom-dropdown-selected" id="deposit-symbol-selected">
+                        <div class="dropdown-text">
+                            <div id="coin-icon-preview-dropdown"></div>
+                            <span class="dropdown-selected-text">Selectează o monedă...</span>
+                        </div>
+                        <span class="dropdown-arrow">▼</span>
+                    </div>
+                    <div class="custom-dropdown-options" id="deposit-symbol-options">
+                        <!-- Opțiunile vor fi populate de wallet.js -->
+                    </div>
+                    <!-- Input hidden pentru a păstra valoarea selectată -->
+                    <select id="deposit-symbol" class="hidden-select" style="display: none;">
+                        <!-- Opțiunile vor fi populate de wallet.js -->
+                    </select>
+                </div>
+                
+                <!-- Secțiunea de detalii despre moneda selectată -->
+                <div id="coin-details-section" class="coin-details-section" style="display: none;">
+                    <div class="coin-details-header">
+                        <div id="coin-icon-preview" class="coin-icon-large"></div>
+                        <div class="coin-details-title">
+                            <h3 id="coin-name-display">-</h3>
+                            <span id="coin-symbol-display" class="coin-symbol">-</span>
+                        </div>
+                    </div>
+                    <div class="coin-details-grid">
+                        <div class="coin-detail-item">
+                            <span class="detail-label">Preț:</span>
+                            <span id="coin-price-display" class="detail-value">€0.00</span>
+                        </div>
+                        <div class="coin-detail-item">
+                            <span class="detail-label">Schimbare 24h:</span>
+                            <span id="coin-change-display" class="detail-value">0.00%</span>
+                        </div>
+                        <div class="coin-detail-item">
+                            <span class="detail-label">Volum 24h:</span>
+                            <span id="coin-volume-display" class="detail-value">€0.00</span>
+                        </div>
+                        <div class="coin-detail-item">
+                            <span class="detail-label">Market Cap:</span>
+                            <span id="coin-marketcap-display" class="detail-value">€0.00</span>
+                        </div>
+                        <div class="coin-detail-item">
+                            <span class="detail-label">High 24h:</span>
+                            <span id="coin-high-display" class="detail-value positive">€0.00</span>
+                        </div>
+                        <div class="coin-detail-item">
+                            <span class="detail-label">Low 24h:</span>
+                            <span id="coin-low-display" class="detail-value negative">€0.00</span>
+                        </div>
+                    </div>
+                    <!-- Afișează prețul monedei selectate pentru calcul -->
+                    <div id="current-coin-price" class="current-price-display">1 Monedă = €0.00</div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="deposit-quantity">Cantitate:</label>
+                <!-- Input pentru Cantitate -->
+                <input type="number" id="deposit-quantity" min="0.000001" step="any" placeholder="0.000000">
+            </div>
+            
+            <div class="deposit-summary">
+                <p>Valoare totală estimată:</p>
+                <!-- Afișează valoarea totală calculată (cantitate * preț) -->
+                <h3 id="deposit-value">€0.00</h3>
+            </div>
+            
+            <button id="confirm-deposit-btn" class="action-button primary full-width">Confirmă Depozitul</button>
+        </div>
+    </div>
+    <!-- 🛑 SFÂRȘIT MODAL DE DEPOZIT 🛑 -->
+
+    <script src="../../navbar/loadNavbar.js"></script>
+    <!-- Logica Portofelului -->
+    <script type="module" src="wallet.js"></script> 
+</body>
+</html>

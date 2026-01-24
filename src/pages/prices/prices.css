@@ -1,0 +1,300 @@
+/* =========================================================================
+ * 1. STILURI CARUSEL (PRICE CAROUSEL)
+ * ========================================================================= */
+#price-carousel-wrapper {
+    margin: 30px;
+}
+
+#price-carousel-wrapper h2 {
+    font-size: 1.5em;
+    margin-bottom: 15px;
+    color: #8B949E;
+}
+
+#price-carousel {
+    /* Containerul vizibil care ascunde scrollbar-ul */
+    width: 100%;
+    overflow-x: hidden; 
+    white-space: nowrap; 
+    padding: 10px 0;
+    border-radius: 12px;
+    background-color: transparent; 
+    box-shadow: none; 
+}
+
+.carousel-inner {
+    display: inline-flex;
+}
+
+.carousel-item {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 15px;
+    margin-right: 15px;
+    width: 180px; 
+    height: 120px;
+    background-color: #161B22; /* Fundal item carusel */
+    border: 1px solid #30363D;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    white-space: normal;
+    flex-shrink: 0;
+}
+
+.carousel-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+}
+
+.coin-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: bold;
+    color: #fff;
+    width: 100%;
+    justify-content: center;
+}
+.price-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 5px 0;
+}
+.price-info .price {
+    font-size: 1.1em;
+    font-weight: bold;
+}
+.price-info .change {
+    font-size: 0.9em;
+}
+.carousel-sparkline {
+    width: 100%;
+    height: 30px;
+}
+
+
+/* =========================================================================
+ * 2. STILURI TABEL (CRYPTO TABLE)
+ * ========================================================================= */
+.table-container {
+    background-color: #161B22; 
+    border-radius: 12px;
+    overflow: hidden;       
+    border: 1px solid #30363D;
+    margin: 30px;
+}
+
+.table-container table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+}
+
+.table-container th, 
+.table-container td {
+    padding: 16px 20px;
+    text-align: left;
+    border-bottom: 1px solid #30363D;
+    cursor: default; 
+}
+
+.table-container tbody tr:hover {
+    background-color: #1f252b; 
+    cursor: pointer !important;
+}
+
+.table-container thead th {
+    color: #8B949E; 
+    font-size: 0.9em;
+    font-weight: bold;
+}
+
+.table-container tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* Lățimi Coloane */
+.table-container th:nth-child(1), .table-container td:nth-child(1) { width: 4%; }
+.table-container th:nth-child(2), .table-container td:nth-child(2) { width: 26%; }
+.table-container th:nth-child(3), .table-container td:nth-child(3) { width: 14%; }
+.table-container th:nth-child(4), .table-container td:nth-child(4) { width: 10%; }
+.table-container th:nth-child(5), .table-container td:nth-child(5) { width: 14%; }
+.table-container th:nth-child(6), .table-container td:nth-child(6) { width: 12%; }
+.table-container th:nth-child(7), .table-container td:nth-child(7) { width: 10%; }
+.table-container th:nth-child(8), .table-container td:nth-child(8) { width: 10%; }
+
+/* Procente (Pozitive/Negative) */
+.positive {
+    color: #34d399; 
+}
+.negative {
+    color: #f87171; 
+}
+
+/* Butonul Trade */
+.trade-button {
+    background-color: #007bff;
+    color: white;
+    font-weight: bold;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px; 
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.trade-button:hover {
+    background-color: #0056b3; 
+}
+
+
+/* =========================================================================
+ * 3. STILURI MODAL ȘI GRAFICE (APEXCHARTS OVERRIDES)
+ * ========================================================================= */
+.modal {
+    display: none; 
+    position: fixed; 
+    z-index: 1000; 
+    left: 0;
+    top: 0;
+    width: 100%; 
+    height: 100%;
+    overflow: auto; 
+    background-color: rgba(0, 0, 0, 0.7); 
+    backdrop-filter: blur(5px);
+}
+
+.modal-content {
+    background-color: #161B22; 
+    margin: 5% auto; 
+    padding: 30px;
+    border: 1px solid #30363D;
+    width: 80%; 
+    max-width: 900px;
+    border-radius: 12px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+}
+
+.close-button {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.close-button:hover,
+.close-button:focus {
+    color: white;
+    text-decoration: none;
+}
+
+#modal-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #30363D;
+    padding-bottom: 10px;
+}
+
+#modal-header img {
+    margin-right: 15px;
+}
+
+/* Grila de statistici */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr); 
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.stat-item {
+    background-color: #0D1117;
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px solid #30363D;
+}
+
+.stat-label {
+    color: #8B949E;
+    font-size: 0.9em;
+    margin-bottom: 5px;
+}
+
+.stat-value {
+    font-size: 1.2em;
+    font-weight: bold;
+    color: white;
+}
+
+#modal-chart-container {
+    height: 300px; 
+    margin-bottom: 30px;
+}
+
+/* Secțiunile de sub grafic */
+.details-section-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr; 
+    gap: 30px;
+    margin-top: 20px;
+}
+
+.section-title {
+    color: #fff;
+    font-size: 1.2em;
+    margin-bottom: 15px;
+    border-bottom: 1px solid #30363D;
+    padding-bottom: 5px;
+}
+
+.high-low-box #high-low-data {
+    display: grid;
+    grid-template-columns: 1fr 1fr; 
+    gap: 20px;
+}
+
+.link-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0; 
+}
+
+.simulated-link {
+    display: block;
+    background-color: #1f252b;
+    color: #007bff; 
+    text-decoration: none;
+    padding: 10px 15px;
+    border-radius: 6px;
+    border: 1px solid #30363D;
+    transition: background-color 0.2s;
+}
+
+.simulated-link:hover {
+    background-color: #30363D;
+}
+
+/* ApexCharts Overrides (Tooltip) */
+.apexcharts-tooltip {
+    background: #161B22 !important; 
+    border: 1px solid #30363D !important;
+    color: white !important;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5) !important;
+}
+.apexcharts-tooltip-text {
+    color: white !important;
+    font-weight: bold !important;
+}
+.apexcharts-tooltip-title {
+    display: none !important;
+}
+.apexcharts-tooltip-series-group:first-child .apexcharts-tooltip-marker {
+    display: none !important;
+}
