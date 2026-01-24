@@ -42,14 +42,14 @@ document.addEventListener('DOMContentLoaded', () => {
     loadLimitOrders();
     loadTradeHistory();
     setupEventListeners();
-    loadMarketData();
+    loadMarketData(); // Aceasta va preselecta automat BTC când datele sunt încărcate
     startPriceMonitoring();
     
-    // Verifică dacă există parametru symbol în URL
+    // Verifică dacă există parametru symbol în URL (are prioritate față de BTC)
     const urlParams = new URLSearchParams(window.location.search);
     const symbolParam = urlParams.get('symbol');
     if (symbolParam) {
-        // Așteaptă ca datele să se încarce, apoi selectează moneda
+        // Așteaptă ca datele să se încarce, apoi selectează moneda specificată
         setTimeout(() => autoSelectCoin(symbolParam), 1000);
     }
 });
@@ -285,17 +285,24 @@ function populateCoinSelector(coins) {
     }
     
     // Preselectează BTC după ce s-au adăugat toate opțiunile
-    const btcCoin = coins.find(c => c.CoinInfo.Name === 'BTC');
-    if (btcCoin) {
-        selectCoin(btcCoin);
-        const btcIconUrl = `https://www.cryptocompare.com${btcCoin.CoinInfo.ImageUrl}`;
-        selectedText.textContent = `BTC - ${btcCoin.CoinInfo.FullName}`;
-        iconPreview.src = btcIconUrl;
-        iconPreview.style.display = 'block';
-        iconPreview.onerror = function() {
-            this.src = 'https://placehold.co/24x24/161B22/FFFFFF?text=?';
-        };
-        select.value = 'BTC';
+    // Verificăm dacă există parametru symbol în URL - are prioritate
+    const urlParams = new URLSearchParams(window.location.search);
+    const symbolParam = urlParams.get('symbol');
+    
+    // Dacă nu există parametru în URL, selectăm BTC automat
+    if (!symbolParam) {
+        const btcCoin = coins.find(c => c.CoinInfo.Name === 'BTC');
+        if (btcCoin) {
+            selectCoin(btcCoin);
+            const btcIconUrl = `https://www.cryptocompare.com${btcCoin.CoinInfo.ImageUrl}`;
+            selectedText.textContent = `BTC - ${btcCoin.CoinInfo.FullName}`;
+            iconPreview.src = btcIconUrl;
+            iconPreview.style.display = 'block';
+            iconPreview.onerror = function() {
+                this.src = 'https://placehold.co/24x24/161B22/FFFFFF?text=?';
+            };
+            select.value = 'BTC';
+        }
     }
 }
 

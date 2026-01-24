@@ -922,6 +922,8 @@ function renderAssets() {
     
     if (userAssets.length === 0) {
         assetsContainer.innerHTML = '<div style="grid-column: 1 / -1; display: flex; align-items: center; justify-content: center; min-height: 300px; color: #8B949E; font-size: 16px; text-align: center;">Nu ai assets încă. Fă un depozit pentru a începe!</div>';
+        // Actualizează UI-ul pentru a reflecta valoarea 0 a portofelului
+        updateUI(currentBalance);
         return;
     }
     
@@ -967,6 +969,9 @@ function renderAssets() {
         
         assetsContainer.appendChild(assetCard);
     });
+    
+    // IMPORTANT: Actualizează valoarea totală a portofelului după ce am afișat toate assets-urile
+    updateUI(currentBalance);
 }
 
 
