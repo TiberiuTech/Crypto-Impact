@@ -59,6 +59,13 @@ function renderNews(news) {
     });
 }
 
+/** SVG local — nu depinde de via.placeholder (uneori blocat); evită „cutii” gri goale. */
+const PLACEHOLDER_IMG =
+    'data:image/svg+xml,' +
+    encodeURIComponent(
+        '<svg xmlns="http://www.w3.org/2000/svg" width="800" height="400" viewBox="0 0 800 400"><rect fill="#21262D" width="800" height="400"/><text x="400" y="200" fill="#8B949E" font-family="system-ui,sans-serif" font-size="18" text-anchor="middle">News</text></svg>'
+    );
+
 function createNewsCard(article) {
     const card = document.createElement('div');
     card.className = 'news-card';
@@ -66,42 +73,98 @@ function createNewsCard(article) {
     const publishedDate = new Date(article.published_on * 1000);
     const formattedDate = formatDate(publishedDate);
 
-    const imageUrl = article.imageurl || 'https://via.placeholder.com/400x200/21262D/8B949E?text=No+Image';
+    const rawImg =
+        article.imageurl ||
+        article.imageUrl ||
+        (article.enclosure && article.enclosure.url) ||
+        '';
+    const imageUrl = typeof rawImg === 'string' && rawImg.trim() ? rawImg.trim() : PLACEHOLDER_IMG;
 
     const tags = article.tags ? article.tags.split('|').slice(0, 3) : [];
 
-    card.innerHTML = `
-        <img src="${imageUrl}" alt="${article.title}" class="news-card-image" onerror="this.src='https://via.placeholder.com/400x200/21262D/8B949E?text=No+Image'">
-        
-        <div class="news-card-content">
-            <div class="news-card-meta">
-                <div class="news-card-source">
-                    <img src="${article.source_info.img}" alt="${article.source_info.name}" onerror="this.style.display='none'">
-                    <span>${article.source_info.name}</span>
-                </div>
-                <span class="news-card-date">${formattedDate}</span>
-            </div>
+    const thumb = document.createElement('img');
+    thumb.className = 'news-card-image';
+    thumb.alt = article.title || '';
+    thumb.decoding = 'async';
+    thumb.src = imageUrl;
+    let thumbFallback = false;
+    thumb.onerror = () => {
+        if (!thumbFallback) {
+            thumbFallback = true;
+            thumb.src = PLACEHOLDER_IMG;
+        }
+    };
 
-            <h3 class="news-card-title">${article.title}</h3>
-            
-            <p class="news-card-description">${article.body}</p>
+    const content = document.createElement('div');
+    content.className = 'news-card-content';
 
-            ${tags.length > 0 ? `
-                <div class="news-card-tags">
-                    ${tags.map(tag => `<span class="news-tag">${tag}</span>`).join('')}
-                </div>
-            ` : ''}
+    const meta = document.createElement('div');
+    meta.className = 'news-card-meta';
 
-            <div class="news-card-footer">
-                <a href="${article.url}" target="_blank" rel="noopener noreferrer" class="read-more">
-                    Read more
-                </a>
-            </div>
-        </div>
-    `;
+    const sourceRow = document.createElement('div');
+    sourceRow.className = 'news-card-source';
+
+    const srcIcon = document.createElement('img');
+    const si = article.source_info || {};
+    srcIcon.src = si.img || '';
+    srcIcon.alt = si.name || '';
+    srcIcon.onerror = () => {
+        srcIcon.style.display = 'none';
+    };
+
+    const srcName = document.createElement('span');
+    srcName.textContent = si.name || '';
+
+    sourceRow.appendChild(srcIcon);
+    sourceRow.appendChild(srcName);
+
+    const dateEl = document.createElement('span');
+    dateEl.className = 'news-card-date';
+    dateEl.textContent = formattedDate;
+
+    meta.appendChild(sourceRow);
+    meta.appendChild(dateEl);
+
+    const titleEl = document.createElement('h3');
+    titleEl.className = 'news-card-title';
+    titleEl.textContent = article.title || '';
+
+    const descEl = document.createElement('p');
+    descEl.className = 'news-card-description';
+    descEl.textContent = article.body || '';
+
+    content.appendChild(meta);
+    content.appendChild(titleEl);
+    content.appendChild(descEl);
+
+    if (tags.length > 0) {
+        const tagWrap = document.createElement('div');
+        tagWrap.className = 'news-card-tags';
+        tags.forEach((tag) => {
+            const t = document.createElement('span');
+            t.className = 'news-tag';
+            t.textContent = tag.trim();
+            tagWrap.appendChild(t);
+        });
+        content.appendChild(tagWrap);
+    }
+
+    const footer = document.createElement('div');
+    footer.className = 'news-card-footer';
+    const link = document.createElement('a');
+    link.href = article.url || '#';
+    link.target = '_blank';
+    link.rel = 'noopener noreferrer';
+    link.className = 'read-more';
+    link.textContent = 'Read more →';
+    footer.appendChild(link);
+    content.appendChild(footer);
+
+    card.appendChild(thumb);
+    card.appendChild(content);
 
     card.addEventListener('click', (e) => {
-        if (!e.target.closest('.read-more')) {
+        if (!e.target.closest('.read-more') && article.url) {
             window.open(article.url, '_blank');
         }
     });

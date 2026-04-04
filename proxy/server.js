@@ -8,6 +8,163 @@ const PORT = 3000;
 
 const API_KEY = process.env.API_KEY;
 
+/** Știri doar din fluxuri RSS (fără cheie API). */
+const RSS_NEWS_FEEDS = [
+    { url: 'https://decrypt.co/feed', name: 'Decrypt', favicon: 'https://decrypt.co/favicon.ico' },
+    { url: 'https://news.bitcoin.com/feed/', name: 'Bitcoin.com', favicon: 'https://news.bitcoin.com/favicon.ico' },
+    { url: 'https://cointelegraph.com/rss', name: 'Cointelegraph', favicon: 'https://cointelegraph.com/favicon.ico' },
+];
+
+function stripHtml(html) {
+    return String(html).replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+}
+
+function extractTag(block, tag) {
+    const re = new RegExp(`<${tag}[^>]*>([\\s\\S]*?)<\\/${tag}>`, 'i');
+    const m = block.match(re);
+    if (!m) return '';
+    let inner = m[1].trim().replace(/<!\[CDATA\[([\s\S]*?)\]\]>/gi, '$1');
+    return inner.trim();
+}
+
+function extractItemLink(block) {
+    let link = extractTag(block, 'link');
+    link = link.replace(/<!\[CDATA\[([\s\S]*?)\]\]>/gi, '$1').trim();
+    if (link) return link;
+    const m = block.match(/<link[^>]+href=["']([^"']+)["'][^>]*\/?>/i);
+    return m ? m[1].trim() : '';
+}
+
+function firstImgSrc(html) {
+    if (!html) return '';
+    const s = String(html);
+    let m = s.match(/<img[^>]+src=["']([^"']+)["']/i);
+    if (m) return m[1].trim();
+    m = s.match(/\sdata-src=["']([^"']+)["']/i);
+    if (m) return m[1].trim();
+    m = s.match(/srcset=["']([^"']+)["']/i);
+    if (m) {
+        const first = m[1].split(',')[0].trim().split(/\s+/)[0];
+        if (first) return first;
+    }
+    return '';
+}
+
+function resolveImageUrl(url, articleUrl) {
+    if (!url || typeof url !== 'string') return '';
+    const u = url.trim();
+    if (/^https?:\/\//i.test(u)) return u;
+    if (u.startsWith('//')) return `https:${u}`;
+    try {
+        return new URL(u, articleUrl).href;
+    } catch {
+        return u;
+    }
+}
+
+/** Imagini din RSS: la Decrypt sunt în <media:thumbnail> / <enclosure>, nu în <description> (text scurt). */
+function extractRssItemImage(block, articleLink) {
+    const contentEncoded = extractTag(block, 'content:encoded');
+    const description = extractTag(block, 'description');
+
+    let raw = '';
+
+    const mt = block.match(/<media:thumbnail[^>]*url=["']([^"']+)["']/i);
+    if (mt) raw = mt[1].trim();
+
+    if (!raw) {
+        const enc = block.match(/<enclosure[^>]+url=["']([^"']+)["'][^>]*type=["']image\//i);
+        if (enc) raw = enc[1].trim();
+    }
+
+    if (!raw) {
+        raw = firstImgSrc(contentEncoded) || firstImgSrc(description) || '';
+    }
+
+    if (!raw) {
+        const mcm = block.matchAll(/<media:content\s+([^>]+)\/?>/gi);
+        for (const mc of mcm) {
+            const attrs = mc[1];
+            const um = attrs.match(/url=["']([^"']+)["']/i);
+            if (!um) continue;
+            if (/medium=["']image["']/i.test(attrs) || /type=["']image\//i.test(attrs)) {
+                raw = um[1].trim();
+                break;
+            }
+        }
+    }
+    if (!raw) {
+        const m = block.match(/<media:content[^>]*url=["']([^"']+)["']/i);
+        if (m) raw = m[1].trim();
+    }
+
+    raw = resolveImageUrl(raw, articleLink);
+    return raw || '';
+}
+
+function parseRssItems(xml, meta) {
+    const items = [];
+    const itemRe = /<item>([\s\S]*?)<\/item>/gi;
+    let m;
+    while ((m = itemRe.exec(xml)) !== null && items.length < 40) {
+        const block = m[1];
+        const title = stripHtml(extractTag(block, 'title'));
+        const link = extractItemLink(block);
+        const pubDate = extractTag(block, 'pubDate');
+        const description = extractTag(block, 'description');
+        const contentEncoded = extractTag(block, 'content:encoded');
+        const excerptSource = description || contentEncoded;
+        if (!title || !link) continue;
+        const publishedOn = Math.floor(new Date(pubDate).getTime() / 1000) || Math.floor(Date.now() / 1000);
+        let img = extractRssItemImage(block, link);
+        if (!img) {
+            img = 'https://via.placeholder.com/400x200/21262D/8B949E?text=News';
+        }
+        items.push({
+            title,
+            body: stripHtml(excerptSource).slice(0, 800),
+            url: link,
+            published_on: publishedOn,
+            imageurl: img,
+            tags: 'CRYPTO|BLOCKCHAIN|MARKET',
+            source_info: { name: meta.name, img: meta.favicon },
+        });
+    }
+    return items;
+}
+
+async function fetchNewsFromRss() {
+    const headers = {
+        'User-Agent':
+            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        Accept: 'application/rss+xml, application/xml, text/xml, */*',
+    };
+    let lastErr = null;
+    for (const feed of RSS_NEWS_FEEDS) {
+        try {
+            const res = await fetch(feed.url, { headers });
+            if (!res.ok) {
+                lastErr = new Error(`RSS HTTP ${res.status} ${feed.url}`);
+                continue;
+            }
+            const xml = await res.text();
+            if (!xml.includes('<item')) {
+                lastErr = new Error(`RSS: no <item> in ${feed.url}`);
+                continue;
+            }
+            const items = parseRssItems(xml, feed);
+            if (items.length > 0) {
+                console.log(`News: RSS from ${feed.name} (${items.length} articles)`);
+                return items;
+            }
+            lastErr = new Error(`RSS: no items parsed ${feed.url}`);
+        } catch (e) {
+            lastErr = e;
+        }
+    }
+    throw lastErr || new Error('RSS: all feeds failed');
+}
+
 app.use(cors());
 
 app.use(express.static(path.join(__dirname, '..', 'src')));
@@ -70,28 +227,12 @@ app.get('/api/history', async (req, res) => {
 });
 
 app.get('/api/news', async (req, res) => {
-
-    const apiUrl = `https://min-api.cryptocompare.com/data/v2/news/?lang=EN&api_key=${API_KEY}`;
-
     try {
-        const response = await fetch(apiUrl);
-        
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(`Error at CryptoCompare News API: ${errorData.Message}`);
-        }
-
-        const data = await response.json();
-        
-        if (data.Data && Array.isArray(data.Data)) {
-            res.json(data.Data);
-        } else {
-            throw new Error('The response format is invalid');
-        }
-
+        const articles = await fetchNewsFromRss();
+        res.json(articles);
     } catch (error) {
-        console.error("Error in proxy at news data:", error.message);
-        res.status(500).json({ message: "Error at news data" });
+        console.error('Error in proxy at news (RSS):', error.message);
+        res.status(500).json({ message: 'Error at news data' });
     }
 });
 
