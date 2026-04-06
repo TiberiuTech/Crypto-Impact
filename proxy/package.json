@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
+    "start": "concurrently -n http,ws -c cyan,magenta \"node server.js\" \"node ws_server.js\"",
+    "start:http": "node server.js",
+    "start:ws": "node ws_server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -15,5 +18,8 @@
     "express": "^5.1.0",
     "node-fetch": "^3.3.2",
     "ws": "^8.18.3"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
   }
 }
